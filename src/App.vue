@@ -1,18 +1,21 @@
 <script>
+import Home from './components/home.vue'
+
 export default{
+  name: "App",
+  components: ["Home"]
 }
 </script>
 
 <template>
-  <div id="parent">
+  <div class="base">
+    <Home></Home>
   </div>
 </template>
 
-<style scoped>
-#parent {
-  /* display: grid;
-  grid-template-columns: 1fr 1fr 1fr; */
-  width: 100%;
-  height: 100%;
+<style>
+.base {
+  width: auto;
+  height: auto;
 }
 </style>
