@@ -1,13 +1,22 @@
 <script>
+import Indiv from './indiv.vue'
+
 export default{
-  name: "Home"
+  name: "Home",
+  components: {Indiv},
+  data() {
+    return {
+      array: [0,1,2],
+    }
+  },  
 }
 </script>
 
 <template>
   <div class="base">
     <div id="container">
-      <div v-for="i in [0,1,2]" class="list-item"></div>
+      <Indiv v-for="i in this.array" class="individual" :entity="i" :key="i">
+      </Indiv>
     </div>
   </div>
 </template>
@@ -15,11 +24,4 @@ export default{
 <style scoped>
 div { color: red; }
 
-#container {
-  display: grid;
-}
-
-.list-item {
-  background-color: lavender;
-}
 </style>

@@ -3,7 +3,7 @@ import Home from './components/home.vue'
 
 export default{
   name: "App",
-  components: ["Home"]
+  components: {Home}
 }
 </script>
 
@@ -15,7 +15,7 @@ export default{
 
 <style>
 .base {
-  width: auto;
   height: auto;
+  width: auto;
 }
 </style>
