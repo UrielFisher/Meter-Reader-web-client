@@ -1,5 +1,6 @@
 <script>
 export default{
+  name: "Camera",
   data() {
     return {
       height: 0,
@@ -10,8 +11,8 @@ export default{
   mounted() {
     const video = document.getElementById("video")
     const canvas = document.getElementById("canvas")
-    const photo = document.getElementById('photo');
-    const startbutton = document.getElementById('startbutton');
+    const picture = document.getElementById('picture');
+    const snapButton = document.getElementById('snapButton');
     
     navigator.mediaDevices.getUserMedia({video: true, audio: false})
     .then((stream) => {
@@ -20,11 +21,12 @@ export default{
     })
     .catch((error) => {
       console.log("ERROR: "+ error);
+      // go back to home screen
     })
 
     video.addEventListener(
       "canplay",
-      (ev) => {
+      () => {
         if (!this.streaming) {
           this.height = (video.videoHeight / video.videoWidth) * this.width;
         
@@ -35,19 +37,19 @@ export default{
           this.streaming = true;
         }
       },
-      false,
+      {once: true},
     );
-    startbutton.addEventListener(
+    snapButton.addEventListener(
       "click",
       (ev) => {
         ev.preventDefault();
-        this.takepicture();
+        this.takePicture();
       },
-      false,
+      false
     );
   },
   methods: {
-    takepicture() {
+    takePicture() {
       const context = canvas.getContext("2d");
       if (this.width && this.height) {
         canvas.width = this.width;
@@ -55,18 +57,18 @@ export default{
         context.drawImage(video, 0, 0, this.width, this.height);
       
         const data = canvas.toDataURL("image/png");
-        photo.setAttribute("src", data);
+        picture.setAttribute("src", data);
       } else {
-        this.clearphoto();
+        this.clearPicture();
       }
     },
-    clearphoto() {
+    clearPicture() {
       const context = canvas.getContext("2d");
       context.fillStyle = "#AAA";
       context.fillRect(0, 0, canvas.width, canvas.height);
 
       const data = canvas.toDataURL("image/png");
-      photo.setAttribute("src", data);
+      picture.setAttribute("src", data);
     },
   },
 }
@@ -75,30 +77,51 @@ export default{
 <template>
   <div id="parent">
     <video id="video"></video>
-    <button id="startbutton">Take photo</button>
-    <canvas id="canvas"> </canvas>
-    <div class="output">
-      <img id="photo" alt="The screen capture will appear in this box." />
-    </div>
+    <img id="picture" />
+    <button id="snapButton">Take picture</button>
+    <canvas id="canvas"></canvas>
   </div>
 </template>
 
 <style scoped>
 #parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
 }
 
 #video {
-  position: relative;
-  width: 50%;
-  height: 50%;
-  top: 25vh;
-  left:25vw;
-  border: 3px solid black;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
-#startbutton {
+#picture {
   position: absolute;
+  width: 100%;  
+  /* height: 100%; */
+}
+
+#snapButton {
+  position: absolute;
+  bottom: 10vh;
+  bottom: 10dvh;
+  width: 10vw;
+  height: 10vh;
+  left: 45vw;
+  border-radius: 50px;
+}
+
+#canvas {
+  display: none;
+}
+
+@media (orientation: portrait){
+  #snapButton {
+    width: 10vh;
+    left: calc(50vw - 5vh);
+  }
 }
 </style>
