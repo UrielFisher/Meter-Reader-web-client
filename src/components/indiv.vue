@@ -4,7 +4,7 @@ import Field from './field.vue'
 export default{
   name: "Indiv",
   components: {Field},
-  // props: ["entity"],
+  props: ["entity"],
   data() {
     return {
       fields: ["name", "water", "electricity", "gas"]
@@ -17,12 +17,6 @@ export default{
 <template>
   <div class="list-item">
     <Field v-for="i in this.fields" :type="i" :entity="entity"></Field>
-
-    <!-- <p class="name">example name</p>
-    <Field><p class="water">03121</p></Field>
-    <Field><p class="electricity">00113</p></Field>
-    <Field><p>12345</p></Field>
-    <Field><p class="name">example name</p></Field> -->
   </div>
 </template>
 
@@ -39,10 +33,5 @@ export default{
   border-radius: 20px;
   background-color: lavender;
   border: 2.5px solid #000000bb;
-}
-
-.name {
-  font-weight: 600;
-  text-decoration: underline;
 }
 </style>

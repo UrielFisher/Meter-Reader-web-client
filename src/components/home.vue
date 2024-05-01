@@ -22,6 +22,4 @@ export default{
 </template>
 
 <style scoped>
-div { color: red; }
-
 </style>
