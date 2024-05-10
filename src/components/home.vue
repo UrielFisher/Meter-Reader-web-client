@@ -6,7 +6,7 @@ export default{
   components: {Indiv},
   data() {
     return {
-      array: [0,1,2],
+      array: ["ידז","עגד גשדשד","גדכגדשד"],
     }
   },  
 }
