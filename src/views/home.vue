@@ -1,5 +1,5 @@
 <script>
-import Indiv from './indiv.vue'
+import Indiv from './../components/indiv.vue'
 
 export default{
   name: "Home",

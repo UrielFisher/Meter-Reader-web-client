@@ -1,5 +1,5 @@
 <script>
-import Home from './components/home.vue'
+import Home from './views/home.vue'
 
 export default{
   name: "App",
@@ -9,7 +9,7 @@ export default{
 
 <template>
   <div class="base">
-    <Home></Home>
+    <router-view />
   </div>
 </template>
 
