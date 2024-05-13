@@ -14,14 +14,14 @@ export default{
     const picture = document.getElementById('picture');
     const snapButton = document.getElementById('snapButton');
     
-    navigator.mediaDevices.getUserMedia({video: true, audio: false})
+    navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})  
     .then((stream) => {
       video.srcObject = stream  
       video.play()
     })
     .catch((error) => {
       console.log("ERROR: "+ error);
-      // go back to home screen
+      // this.$router.push('/')
     })
 
     video.addEventListener(
@@ -85,43 +85,47 @@ export default{
 
 <style scoped>
 #parent {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+  position: fixed;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  outline: 5px dashed red;
+  outline-offset: -5px;
 }
 
 #video {
-  position: absolute;
+  position: fixed;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
+  outline: 3px dashed blue;
+  outline-offset: -3px;
 }
 
 #picture {
-  position: absolute;
-  width: 100%;  
-  /* height: 100%; */
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  /* height: 100dvh; */
+  outline: 10px dashed black;
+  outline-offset: -10px;
 }
 
 #snapButton {
-  position: absolute;
+  position: fixed;
   bottom: 10vh;
-  bottom: 10dvh;
-  width: 10vw;
+  width: 10vh;
   height: 10vh;
-  left: 45vw;
+  left: calc(50vw - 5vh);
   border-radius: 50px;
+  outline: 3px dashed orange;
+  outline-offset: -3px;
 }
 
 #canvas {
   display: none;
-}
-
-@media (orientation: portrait){
-  #snapButton {
-    width: 10vh;
-    left: calc(50vw - 5vh);
-  }
 }
 </style>

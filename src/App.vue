@@ -13,7 +13,7 @@ export default{
 
 <style>
 .base {
-  height: auto;
-  width: auto;
+  height: 100vh;
+  width: 100vw;
 }
 </style>
