@@ -89,7 +89,6 @@ export default{
   /* justify-content: center; */
   /* align-items: center; */
   position: fixed;
-  width: 100%;
   height: 100vh;
   height: 100dvh;
   outline: 5px dashed red;

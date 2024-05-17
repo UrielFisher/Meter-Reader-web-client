@@ -13,7 +13,7 @@ export default{
 </script>
 
 <template>
-  <div class="base">
+  <div class="parent">
     <div id="container">
       <Indiv v-for="i in this.array" class="individual" :entity="i" :key="i">
       </Indiv>
