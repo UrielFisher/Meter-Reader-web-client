@@ -22,13 +22,33 @@ export default {
       const d = new Date
       return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`
     },
+    gasTotal() {
+      return this.final.gas.amount * this.final.gas.rate
+    },
+    sewerTotal() {
+      return this.final.sewer.months?.length ?? 0 * this.final.sewer.rate
+    },
     total() {
       const t = this.final
-      return t.electricity.sum + t.water.sum + (t.gas.amount * t.gas?.rate ?? 0) + (t?.sewer.months?.length ?? 0 * t?.sewer.rate ?? 0)
+      return t.electricity.sum + t.water.sum + this.gasTotal + this.sewerTotal
     },
     sewerAmount() {
       // check for time in months since last bill
       return [2, 3, 4]
+    },
+  },
+  watch: {
+    gasTotal: {
+      handler() {
+        this.final.gas.sum = this.gasTotal
+      },
+      immediate: true
+    },
+    sewerTotal: {
+      handler() {
+        this.final.sewer.sum = this.sewerTotal
+      },
+      immediate: true
     },
   },
   methods: {
@@ -53,19 +73,19 @@ export default {
             <h5 class="partTitle">מים</h5>
             <SumMajor class="partBody" type="water" />
           </div>
-          <div id="gas" v-if="inputData.gas !== 0">
+          <div class="part" id="gas" v-if="inputData.gas !== 0">
             <h5 class="partTitle">גז</h5>
-            <p class="partBody subTotal">{{inputData.gas}} • {{final.gas.rate}} = {{inputData.gas * final.gas.rate}}</p>
+            <p class="partBody subTotal">{{inputData.gas * final.gas.rate}} = {{final.gas.rate}} • {{inputData.gas}}</p>
           </div>
-          <div id="sewer" v-if="inputData.sewer">
+          <div class="part" id="sewer" v-if="inputData.sewer">
             <h5 class="partTitle">ביוב</h5>
             <p class="partBody">{{ sewerAmount.join("/") }}</p>
-            <p class="partBody subTotal">{{sewerAmount.length}} • {{final.sewer.rate}} = {{sewerAmount.length * final.sewer.rate}}</p>
+            <p class="partBody subTotal">{{sewerAmount.length * final.sewer.rate}} = {{final.sewer.rate}} • {{sewerAmount.length}}</p>
           </div>
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="i in Object.values(final).filter((x) => x != 0)">{{ i.rate }}</p>
+            <p class="additive" v-for="i in Object.values(final).filter((x) => x.sum !== 0)">{{ i.sum }}</p>
             <p id="total">{{ total }}</p>
           </div>
         </span>
@@ -105,6 +125,9 @@ export default {
   display: flex;
 }
 
+.part {
+}
+
 .partTitle{
   width: fit-content;
   padding: 5px;
@@ -114,6 +137,11 @@ export default {
 }
 
 .partBody { margin-right: 10vw; }
+
+:is(#gas, #sewer) .partBody {
+  width: fit-content;
+  margin-right: auto;
+}
 
 #sum {
   height: 100%;
@@ -136,5 +164,20 @@ export default {
   width: fit-content;
   border-top: 1px solid black;
   border-bottom: 3px double black;
+}
+</style>
+
+<style>
+.subTotal::after {
+  content: "";
+  display: block;
+  position: relative;
+  height: 3px;
+  width: 20px;
+  top: -0.3em;
+  right: -0.8em;
+  transform: rotate(-30deg);
+  border-block: 1px solid black;
+  z-index: 1;
 }
 </style>

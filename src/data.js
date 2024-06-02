@@ -16,10 +16,12 @@ export const useDataStore = defineStore('data', {
       gas: {
         rate: 202,
         amount: null,
+        sum: null,
       },
       sewer: {
         rate: 67.5,
         months: null,
+        sum: null,
       }
     }, // reset and fetch
   })

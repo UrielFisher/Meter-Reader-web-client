@@ -73,17 +73,4 @@ export default {
 .enil { border-bottom: 1px solid black; }
 
 input{ border: none; }
-
-.subTotal::before {
-  content: "";
-  display: block;
-  position: relative;
-  height: 3px;
-  width: 20px;
-  top: 1.5em;
-  right: -0.8em;
-  transform: rotate(-30deg);
-  border-block: 1px solid black;
-  z-index: 1;
-}
 </style>
