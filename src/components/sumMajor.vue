@@ -40,7 +40,7 @@ export default {
 <template>
   <div class="part">
     <p class="hint">ק. נוכחית</p>
-    <p class="data">{{ t.reading.toFixed(2) }}</p>
+    <p class="data">{{ t.reading?.toFixed(2) }}</p>
     <p class="hint">ק. קודמת</p>
     <p class="data">{{ previous.toFixed(2) }}</p>
     <p class="data line enil">{{ subtract }}</p>

@@ -3,23 +3,24 @@ import { defineStore } from 'pinia'
 export const useDataStore = defineStore('data', {
   state: () => ({
     final: {
+      total: 0,
       electricity: {
-        reading: 1234,
-        rate: 0.5252,
+        reading: null,
+        rate: null,
         sum: null,
       },
       water: {
-        reading: 12345,
-        rate: 9.86,
+        reading: null,
+        rate: null,
         sum: null,
       },
       gas: {
-        rate: 202,
+        rate: null,
         amount: null,
         sum: null,
       },
       sewer: {
-        rate: 67.5,
+        rate: null,
         months: null,
         sum: null,
       }
