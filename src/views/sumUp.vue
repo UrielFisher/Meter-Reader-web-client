@@ -1,52 +1,30 @@
 <script>
+import { mapState } from 'pinia';
+import { useDataStore } from './../data.js'
+import SumMajor from './../components/sumMajor.vue'
+// delete sewer data before save if irrelevant
 export default {
   name: "SumUp",
+  components: {SumMajor},
   data() {
     return {
       inputData: {
         eReading: 12345,
         wReading: 678,
-        gas: 0,
-        sewer: false,
+        gas: 1,
+        sewer: true,
       },
-      rates: {
-        eRate: 0.5252,
-        wRate: 9.86,
-        gRate: 202,
-        sRate: 67.5,
-      },
-      historyJSON: {
-        electricity: {
-          reading: null,
-          rate: null,
-          sum: null,
-        },
-        water: {
-          reading: null,
-          rate: null,
-          sum: null,
-        },
-        gas: {
-          rate: null,
-          amount: null,
-        },
-        sewer: {
-          rate: null,
-          months: null,
-        },
-      },
-      eSubtract: 1000,
-      wSubtract: 1000,
     }
   },
-  mounted() {
-    this.fillGivenData()
-    console.log(this.historyJSON);
-  },
   computed: {
+    ...mapState(useDataStore, ['final']),
     date() {
       const d = new Date
       return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`
+    },
+    total() {
+      const t = this.final
+      return t.electricity.sum + t.water.sum + (t.gas.amount * t.gas?.rate ?? 0) + (t?.sewer.months?.length ?? 0 * t?.sewer.rate ?? 0)
     },
     sewerAmount() {
       // check for time in months since last bill
@@ -54,23 +32,6 @@ export default {
     },
   },
   methods: {
-    fillGivenData() {
-      this.fromReading("electricity")
-      this.fromReading("water")
-      this.historyJSON.gas.amount = this.inputData.gas
-      this.historyJSON.gas.rate = this.rates.gRate
-      if(this.inputData.sewer) {
-        this.historyJSON.sewer.rate = this.rates.sRate
-        this.historyJSON.sewer.months = this.sewerAmount
-      } else {
-        delete this.historyJSON.sewer
-      }
-    },
-    fromReading(type) {
-      this.historyJSON[type].reading = this.inputData[type[0] + 'Reading']
-      this.historyJSON[type].rate = this.rates[type[0] + 'Rate']
-      this.historyJSON[type].sum = this.inputData[type[0] + 'Reading']
-    },
   },
 }
 </script>
@@ -84,36 +45,28 @@ export default {
       </div>
       <div id="content">
         <span id="parts">
-          <div class="part" id="electricity">
-            <p class="hint">ק. נוכחית</p>
-            <p class="data">{{historyJSON.electricity.reading}}</p>
-            <p class="hint">ק. קודמת</p>
-            <p class="data">previous</p>
-            <div class="line"></div>
-            <p class="data">{{eSubtract}}</p>
-            <label class="hint">
-              לפי
-              <input type="number" v-model="rates.eRate" style="width: 50px;">
-            </label>
-            <p class="data">{{eSubtract * rates.eRate}}</p>
-            <p class="hint">17%+</p>
-            <p class="data">{{eSubtract * rates.eRate * 0.17}}</p>
-            <div class="line"></div>
-            <p class="data subTotal">{{eSubtract * rates.eRate * 1.17}}</p>
+          <div id="electricity">
+            <h5 class="partTitle">חשמל</h5>
+            <SumMajor class="partBody" type="electricity" />
           </div>
-          <div id="water"></div>
+          <div id="water">
+            <h5 class="partTitle">מים</h5>
+            <SumMajor class="partBody" type="water" />
+          </div>
           <div id="gas" v-if="inputData.gas !== 0">
-            <p class="subTotal">{{inputData.gas}} • {{rates.gRate}} = {{inputData.gas*rates.gRate}}</p>
+            <h5 class="partTitle">גז</h5>
+            <p class="partBody subTotal">{{inputData.gas}} • {{final.gas.rate}} = {{inputData.gas * final.gas.rate}}</p>
           </div>
           <div id="sewer" v-if="inputData.sewer">
-            <p>{{ sewerAmount.join("/") }}</p>
-            <p class="subTotal">{{sewerAmount.length}} • {{rates.sRate}} = {{sewerAmount.length*rates.sRate}}</p>
+            <h5 class="partTitle">ביוב</h5>
+            <p class="partBody">{{ sewerAmount.join("/") }}</p>
+            <p class="partBody subTotal">{{sewerAmount.length}} • {{final.sewer.rate}} = {{sewerAmount.length * final.sewer.rate}}</p>
           </div>
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="i in Object.values(inputData).filter((x) => x != 0)"></p>
-            <p id="total"></p>
+            <p class="additive" v-for="i in Object.values(final).filter((x) => x != 0)">{{ i.rate }}</p>
+            <p id="total">{{ total }}</p>
           </div>
         </span>
       </div>
@@ -147,27 +100,41 @@ export default {
 
 #content {
   height: 90%;
-}
-
-.line {
-  height: 1px;
-  width: 100px;
-  background-color: black;
-}
-
-.part {
-  display: grid;
-  grid-auto-columns: 85px;
-  grid-auto-rows: 1.5em;
-  width: fit-content;
+  padding: 0px 15px 15px;
   direction: rtl;
+  display: flex;
 }
 
-.data {
-  grid-column: 2;
+.partTitle{
+  width: fit-content;
+  padding: 5px;
+  font-weight: bold;
+  border-radius: 50%;
+  border: 1px solid black;
 }
 
-.hint {
-  grid-column: 1;
+.partBody { margin-right: 10vw; }
+
+#sum {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: end;
+  align-items: end;
+}
+
+.sumDiv {
+  height: fit-content;
+  width: fit-content;
+}
+
+.additive {
+  border-bottom: 1px solid black;
+}
+
+#total{
+  width: fit-content;
+  border-top: 1px solid black;
+  border-bottom: 3px double black;
 }
 </style>
