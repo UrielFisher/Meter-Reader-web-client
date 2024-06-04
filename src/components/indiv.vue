@@ -4,7 +4,7 @@ import Field from './field.vue'
 export default{
   name: "Indiv",
   components: {Field},
-  props: ["entity"],
+  props: ["name"],
   data() {
     return {
       fields: ["name", "electricity", "water", "gas"]
@@ -16,7 +16,7 @@ export default{
 
 <template>
   <div class="list-item">
-    <Field v-for="i in fields" :type="i" :entity="entity"></Field>
+    <Field v-for="i in fields" :type="i" :name="name"></Field>
     <button @click="$router.push('/sumup')" class="sumUp"></button>
   </div>
 </template>

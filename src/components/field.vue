@@ -4,7 +4,7 @@ import { useDataStore } from '@/data';
 
 export default{
   name: "Field",
-  props: ["type", "entity"],
+  props: ["type", "name"],
   computed: { ...mapWritableState(useDataStore, ['final']) }
 }
 </script>
@@ -12,7 +12,7 @@ export default{
 
 <template>
   <div v-if="type === 'name'" class="field-box">
-    <h3 style="text-decoration: underline">{{entity}}</h3>
+    <h3 style="text-decoration: underline">{{ name }}</h3>
   </div>
   <div v-else-if="type === 'gas'" class="field-box">
     <select v-model="final[type].amount">
