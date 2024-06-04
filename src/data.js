@@ -16,7 +16,7 @@ export const useDataStore = defineStore('data', {
       },
       gas: {
         rate: null,
-        amount: null,
+        amount: 0,
         sum: null,
       },
       sewer: {

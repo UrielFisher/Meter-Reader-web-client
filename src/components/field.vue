@@ -1,7 +1,11 @@
 <script>
+import { mapWritableState } from 'pinia';
+import { useDataStore } from '@/data';
+
 export default{
   name: "Field",
   props: ["type", "entity"],
+  computed: { ...mapWritableState(useDataStore, ['final']) }
 }
 </script>
 
@@ -11,16 +15,16 @@ export default{
     <h3 style="text-decoration: underline">{{entity}}</h3>
   </div>
   <div v-else-if="type === 'gas'" class="field-box">
-    <select>
+    <select v-model="final[type].amount">
       <option value="0">0</option>
       <option value="1">1</option>
-      <option value="2">2</option>Z
+      <option value="2">2</option>
     </select>
   </div>
   <div v-else class="field-box">
     <div class="field">
       <button class="symbol"></button>
-      <input type="number" class="numbers" min="0" max="999999">
+      <input v-model="final[type].reading" type="number" class="numbers" min="0" max="999999">
     </div>
   </div>
 </template>

@@ -7,17 +7,17 @@ export default{
   props: ["entity"],
   data() {
     return {
-      fields: ["name", "water", "electricity", "gas"]
+      fields: ["name", "electricity", "water", "gas"]
     }
-  }
+  },
 }
 </script>
 
 
 <template>
   <div class="list-item">
-    <Field v-for="i in this.fields" :type="i" :entity="entity"></Field>
-    <button class="sumUp"></button>
+    <Field v-for="i in fields" :type="i" :entity="entity"></Field>
+    <button @click="$router.push('/sumup')" class="sumUp"></button>
   </div>
 </template>
 

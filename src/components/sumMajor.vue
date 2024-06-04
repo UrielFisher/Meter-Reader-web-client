@@ -37,6 +37,7 @@ export default {
 }
 </script>
 
+
 <template>
   <div class="part">
     <p class="hint">ק. נוכחית</p>
@@ -54,6 +55,7 @@ export default {
     <p class="data subTotal">{{ sum }}</p>
   </div>
 </template>
+
 
 <style scoped>
 .part {

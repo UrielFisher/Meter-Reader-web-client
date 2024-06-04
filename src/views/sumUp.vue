@@ -8,17 +8,18 @@ export default {
   components: {SumMajor},
   data() {
     return {
-      inputData: {
-        eReading: 12345,
-        wReading: 678,
-        gas: 1,
-        sewer: true,
-      },
+      // inputData: {
+      //   eReading: 12345,
+      //   wReading: 678,
+      //   gas: 0,
+      //   sewer: false,
+      // },
     }
   },
   computed: {
     ...mapState(useDataStore, ['final']),
     date() {
+      // return new Date().toISOstring   .split("T")[0]
       const d = new Date
       return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`
     },
@@ -50,6 +51,12 @@ export default {
       },
       immediate: true
     },
+    total: {
+      handler() {
+        this.final.total = this.total
+      },
+      immediate: true
+    },
   },
   methods: {
   },
@@ -65,19 +72,19 @@ export default {
       </div>
       <div id="content">
         <span id="parts">
-          <div id="electricity">
+          <div id="electricity" v-if="final.electricity.reading">
             <h5 class="partTitle">חשמל</h5>
             <SumMajor class="partBody" type="electricity" />
           </div>
-          <div id="water">
+          <div id="water" v-if="final.water.reading">
             <h5 class="partTitle">מים</h5>
             <SumMajor class="partBody" type="water" />
           </div>
-          <div class="part" id="gas" v-if="inputData.gas !== 0">
+          <div class="part" id="gas" v-if="final.gas.amount !== 0">
             <h5 class="partTitle">גז</h5>
-            <p class="partBody subTotal">{{inputData.gas * final.gas.rate}} = {{final.gas.rate}} • {{inputData.gas}}</p>
+            <p class="partBody subTotal">{{final.gas.amount * final.gas.rate}} = {{final.gas.rate}} • {{final.gas.amount}}</p>
           </div>
-          <div class="part" id="sewer" v-if="inputData.sewer">
+          <div class="part" id="sewer" v-if="final.sewer?.months">
             <h5 class="partTitle">ביוב</h5>
             <p class="partBody">{{ sewerAmount.join("/") }}</p>
             <p class="partBody subTotal">{{sewerAmount.length * final.sewer.rate}} = {{final.sewer.rate}} • {{sewerAmount.length}}</p>
