@@ -1,11 +1,11 @@
 <script>
 import { mapWritableState } from 'pinia';
-import { useDataStore } from '@/data';
+import { makeDataStore } from './../data';
 
 export default{
   name: "Field",
   props: ["type", "name"],
-  computed: { ...mapWritableState(useDataStore, ['final']) }
+  computed: { ...mapWritableState(makeDataStore(name), ['final']) }
 }
 </script>
 

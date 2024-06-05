@@ -1,6 +1,6 @@
 <script>
 import { mapState } from 'pinia';
-import { useDataStore } from './../data.js'
+import { makeDataStore } from './../data.js'
 import SumMajor from './../components/sumMajor.vue'
 // delete sewer data before save if irrelevant
 export default {
@@ -17,7 +17,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useDataStore, ['final']),
+    ...mapState(makeDataStore('ידז'), ['final']),
     date() {
       // return new Date().toISOstring   .split("T")[0]
       const d = new Date

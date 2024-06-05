@@ -16,7 +16,7 @@ export default{
 <template>
   <div class="parent">
     <div id="container">
-      <Indiv v-for="name in this.array" class="individual" :name="name" :key="i">
+      <Indiv v-for="name in this.array" class="individual" :name="name" :key="name">
       </Indiv>
     </div>
   </div>

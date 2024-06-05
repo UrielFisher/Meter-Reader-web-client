@@ -1,6 +1,6 @@
 <script>
 import { mapWritableState } from 'pinia';
-import { useDataStore } from './../data.js'
+import { makeDataStore } from './../data.js'
 
 export default {
   name: "SumMajor",
@@ -11,7 +11,7 @@ export default {
     }
   },
   computed: {
-    ...mapWritableState(useDataStore, ['final']),
+    ...mapWritableState(makeDataStore('ידז'), ['final']),
     t() { return this.final[this.type] },
     subtract() {
       return (this.t.reading - this.previous).toFixed(2)
@@ -34,6 +34,9 @@ export default {
       immediate: true
     }
   },
+  mounted() {
+    console.log("h");
+  }
 }
 </script>
 

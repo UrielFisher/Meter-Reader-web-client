@@ -1,4 +1,6 @@
 <script>
+import { mapState } from 'pinia';
+import { makeDataStore } from '../data.js'
 import Field from './field.vue'
 
 export default{
@@ -7,8 +9,12 @@ export default{
   props: ["name"],
   data() {
     return {
-      fields: ["name", "electricity", "water", "gas"]
+      fields: ["name", "electricity", "water", "gas"],
+      na: 'ידז',
     }
+  },
+  computed: {
+    ...mapState(makeDataStore(this.na)(), ['final'])
   },
 }
 </script>
