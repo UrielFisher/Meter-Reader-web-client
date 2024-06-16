@@ -9,9 +9,21 @@ import Camera from './views/camera.vue'
 import SumUp from './views/sumUp.vue'
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/camera', component: Camera },
-  { path: '/sumup', component: SumUp },
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/camera/:name',
+    name: 'Camera',
+    component: Camera
+  },
+  {
+    path: '/sumup/:name',
+    name: 'SumUp',
+    component: SumUp
+  },
 ]
 
 const router = createRouter({

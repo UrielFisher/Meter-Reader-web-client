@@ -1,21 +1,26 @@
 <script>
-import { mapWritableState } from 'pinia';
-import { useDataStore } from '@/data';
+import { makeDataStore } from './../data';
 
 export default{
   name: "Field",
-  props: ["type", "entity"],
-  computed: { ...mapWritableState(useDataStore, ['final']) }
+  props: ["type", "name"],
+  computed: {
+    data() {
+      return makeDataStore(this.name)()
+    }
+  },
+  mounted() {
+  },
 }
 </script>
 
 
 <template>
   <div v-if="type === 'name'" class="field-box">
-    <h3 style="text-decoration: underline">{{entity}}</h3>
+    <h3 style="text-decoration: underline">{{ name }}</h3>
   </div>
   <div v-else-if="type === 'gas'" class="field-box">
-    <select v-model="final[type].amount">
+    <select v-model="data.final[type].amount">
       <option value="0">0</option>
       <option value="1">1</option>
       <option value="2">2</option>
@@ -24,7 +29,7 @@ export default{
   <div v-else class="field-box">
     <div class="field">
       <button class="symbol"></button>
-      <input v-model="final[type].reading" type="number" class="numbers" min="0" max="999999">
+      <input v-model="data.final[type].reading" type="number" class="numbers" min="0" max="999999">
     </div>
   </div>
 </template>

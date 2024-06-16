@@ -1,29 +1,33 @@
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
 
-export const useDataStore = defineStore('data', {
-  state: () => ({
-    final: {
+export const makeDataStore = (name) => {
+  const useDataStore = defineStore(name, {
+    state: () => ({
       total: 0,
-      electricity: {
-        reading: null,
-        rate: null,
-        sum: null,
-      },
-      water: {
-        reading: null,
-        rate: null,
-        sum: null,
-      },
-      gas: {
-        rate: null,
-        amount: 0,
-        sum: null,
-      },
-      sewer: {
-        rate: null,
-        months: null,
-        sum: null,
-      }
-    }, // reset and fetch
+      final: {
+        electricity: {
+          reading: null,
+          rate: null,
+          sum: null,
+        },
+        water: {
+          reading: null,
+          rate: null,
+          sum: null,
+        },
+        gas: {
+          rate: null,
+          amount: 0,
+          sum: null,
+        },
+        sewer: {
+          rate: null,
+          months: null,
+          sum: null,
+        }
+      } // reset and fetch
+    })
   })
-})
+  import.meta.hot?.accept(acceptHMRUpdate(useDataStore, import.meta.hot))
+  return useDataStore
+}

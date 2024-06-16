@@ -1,13 +1,20 @@
 <script>
+import { makeDataStore } from '../data.js'
 import Field from './field.vue'
 
 export default{
   name: "Indiv",
   components: {Field},
-  props: ["entity"],
+  props: ["name"],
   data() {
     return {
-      fields: ["name", "electricity", "water", "gas"]
+      fields: ["name", "electricity", "water", "gas"],
+      na: 'ידז',
+    }
+  },
+  computed: {
+    data() {
+      return makeDataStore(this.$route.params.name)()
     }
   },
 }
@@ -16,8 +23,8 @@ export default{
 
 <template>
   <div class="list-item">
-    <Field v-for="i in fields" :type="i" :entity="entity"></Field>
-    <button @click="$router.push('/sumup')" class="sumUp"></button>
+    <Field v-for="i in fields" :type="i" :name="name"></Field>
+    <button @click="$router.push(`/sumup/${name}`)" class="sumUp"></button>
   </div>
 </template>
 

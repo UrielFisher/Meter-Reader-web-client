@@ -1,6 +1,5 @@
 <script>
-import { mapWritableState } from 'pinia';
-import { useDataStore } from './../data.js'
+import { makeDataStore } from './../data.js'
 
 export default {
   name: "SumMajor",
@@ -11,8 +10,10 @@ export default {
     }
   },
   computed: {
-    ...mapWritableState(useDataStore, ['final']),
-    t() { return this.final[this.type] },
+    data() {
+      return makeDataStore(this.$route.params.name)()
+    },
+    t() { return this.data.final[this.type] },
     subtract() {
       return (this.t.reading - this.previous).toFixed(2)
     },
@@ -29,11 +30,14 @@ export default {
   watch: {
     sum: {
       handler() {
-        this.final[this.type].sum = parseFloat(this.sum)
+        this.data.final[this.type].sum = parseFloat(this.sum)
       },
       immediate: true
     }
   },
+  mounted() {
+    console.log("h");
+  }
 }
 </script>
 
