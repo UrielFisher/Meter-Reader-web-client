@@ -1,5 +1,4 @@
 <script>
-import { mapState } from 'pinia';
 import { makeDataStore } from './../data.js'
 import SumMajor from './../components/sumMajor.vue'
 // delete sewer data before save if irrelevant
@@ -17,20 +16,22 @@ export default {
     }
   },
   computed: {
-    ...mapState(makeDataStore('ידז'), ['final']),
+    data() {
+      return makeDataStore(this.$route.params.name)()
+    },
     date() {
       // return new Date().toISOstring   .split("T")[0]
       const d = new Date
       return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`
     },
     gasTotal() {
-      return this.final.gas.amount * this.final.gas.rate
+      return this.data.final.gas.amount * this.data.final.gas.rate
     },
     sewerTotal() {
-      return this.final.sewer.months?.length ?? 0 * this.final.sewer.rate
+      return this.data.final.sewer.months?.length ?? 0 * this.data.final.sewer.rate
     },
     total() {
-      const t = this.final
+      const t = this.data.final
       return t.electricity.sum + t.water.sum + this.gasTotal + this.sewerTotal
     },
     sewerAmount() {
@@ -41,19 +42,19 @@ export default {
   watch: {
     gasTotal: {
       handler() {
-        this.final.gas.sum = this.gasTotal
+        this.data.final.gas.sum = this.gasTotal
       },
       immediate: true
     },
     sewerTotal: {
       handler() {
-        this.final.sewer.sum = this.sewerTotal
+        this.data.final.sewer.sum = this.sewerTotal
       },
       immediate: true
     },
     total: {
       handler() {
-        this.final.total = this.total
+        this.data.final.total = this.total
       },
       immediate: true
     },
@@ -72,27 +73,27 @@ export default {
       </div>
       <div id="content">
         <span id="parts">
-          <div id="electricity" v-if="final.electricity.reading">
+          <div id="electricity" v-if="data.final.electricity.reading">
             <h5 class="partTitle">חשמל</h5>
             <SumMajor class="partBody" type="electricity" />
           </div>
-          <div id="water" v-if="final.water.reading">
+          <div id="water" v-if="data.final.water.reading">
             <h5 class="partTitle">מים</h5>
             <SumMajor class="partBody" type="water" />
           </div>
-          <div class="part" id="gas" v-if="final.gas.amount !== 0">
+          <div class="part" id="gas" v-if="data.final.gas.amount !== 0">
             <h5 class="partTitle">גז</h5>
-            <p class="partBody subTotal">{{final.gas.amount * final.gas.rate}} = {{final.gas.rate}} • {{final.gas.amount}}</p>
+            <p class="partBody subTotal">{{data.final.gas.amount * data.final.gas.rate}} = {{data.final.gas.rate}} • {{data.final.gas.amount}}</p>
           </div>
-          <div class="part" id="sewer" v-if="final.sewer?.months">
+          <div class="part" id="sewer" v-if="data.final.sewer?.months">
             <h5 class="partTitle">ביוב</h5>
             <p class="partBody">{{ sewerAmount.join("/") }}</p>
-            <p class="partBody subTotal">{{sewerAmount.length * final.sewer.rate}} = {{final.sewer.rate}} • {{sewerAmount.length}}</p>
+            <p class="partBody subTotal">{{sewerAmount.length * data.final.sewer.rate}} = {{data.final.sewer.rate}} • {{sewerAmount.length}}</p>
           </div>
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="i in Object.values(final).filter((x) => x.sum !== 0)">{{ i.sum }}</p>
+            <p class="additive" v-for="i in Object.values(data.final).filter((x) => x.sum !== 0)">{{ i.sum }}</p>
             <p id="total">{{ total }}</p>
           </div>
         </span>

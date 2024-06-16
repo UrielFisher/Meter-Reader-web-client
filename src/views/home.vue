@@ -9,7 +9,7 @@ export default{
       // get user specific
       array: ["ידז","עגד גשדשד","גדכגדשד"],
     }
-  },  
+  },
 }
 </script>
 

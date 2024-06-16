@@ -1,5 +1,4 @@
 <script>
-import { mapWritableState } from 'pinia';
 import { makeDataStore } from './../data.js'
 
 export default {
@@ -11,8 +10,10 @@ export default {
     }
   },
   computed: {
-    ...mapWritableState(makeDataStore('ידז'), ['final']),
-    t() { return this.final[this.type] },
+    data() {
+      return makeDataStore(this.$route.params.name)()
+    },
+    t() { return this.data.final[this.type] },
     subtract() {
       return (this.t.reading - this.previous).toFixed(2)
     },
@@ -29,7 +30,7 @@ export default {
   watch: {
     sum: {
       handler() {
-        this.final[this.type].sum = parseFloat(this.sum)
+        this.data.final[this.type].sum = parseFloat(this.sum)
       },
       immediate: true
     }

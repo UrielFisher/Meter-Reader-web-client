@@ -1,5 +1,4 @@
 <script>
-import { mapState } from 'pinia';
 import { makeDataStore } from '../data.js'
 import Field from './field.vue'
 
@@ -14,7 +13,9 @@ export default{
     }
   },
   computed: {
-    ...mapState(makeDataStore(this.na)(), ['final'])
+    data() {
+      return makeDataStore(this.$route.params.name)()
+    }
   },
 }
 </script>
@@ -23,7 +24,7 @@ export default{
 <template>
   <div class="list-item">
     <Field v-for="i in fields" :type="i" :name="name"></Field>
-    <button @click="$router.push('/sumup')" class="sumUp"></button>
+    <button @click="$router.push(`/sumup/${name}`)" class="sumUp"></button>
   </div>
 </template>
 
