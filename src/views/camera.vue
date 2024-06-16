@@ -6,6 +6,7 @@ export default{
       height: 0,
       width: 320,
       streaming: false,
+      toggleToSnap: false,
     }
   },
   mounted() {
@@ -21,7 +22,6 @@ export default{
     })
     .catch((error) => {
       console.log("ERROR: "+ error);
-      // this.$router.push('/')
     })
 
     video.addEventListener(
@@ -76,23 +76,24 @@ export default{
 
 <template>
   <div id="parent">
-    <video id="video"></video>
-    <img id="picture" />
-    <button id="snapButton">Take picture</button>
     <canvas id="canvas"></canvas>
+    <video id="video"></video>
+    <Transition name="image"><img id="picture" :key="toggleToSnap" /></Transition>
+    <button id="backButton" @click="$router.push('/')">></button>
+    <button id="snapButton" @click="toggleToSnap=!toggleToSnap">Take picture</button>
   </div>
 </template>
 
 <style scoped>
 #parent {
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
-  position: fixed;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  /* position: fixed; */
   height: 100vh;
   height: 100dvh;
-  outline: 5px dashed red;
-  outline-offset: -5px;
+  /* outline: 5px dashed red;
+  outline-offset: -5px; */
 }
 
 #video {
@@ -100,28 +101,44 @@ export default{
   width: 100%;
   height: 100vh;
   height: 100dvh;
-  outline: 3px dashed blue;
+  /* outline: 3px dashed blue; */
   outline-offset: -3px;
 }
 
 #picture {
   position: fixed;
+  width: 30%;
+  height: 30vh;
+  /* height: 100dvh; */
+  outline: 5px dashed black;
+  outline-offset: -5px;
+  transition: 0.3s linear;
+}
+
+.snap-enter-from {
   width: 100%;
   height: 100vh;
-  /* height: 100dvh; */
-  outline: 10px dashed black;
-  outline-offset: -10px;
 }
 
 #snapButton {
   position: fixed;
-  bottom: 10vh;
   width: 10vh;
   height: 10vh;
+  bottom: 10vh;
   left: calc(50vw - 5vh);
   border-radius: 50px;
-  outline: 3px dashed orange;
-  outline-offset: -3px;
+  /* outline: 3px dashed orange; */
+}
+
+#backButton {
+  float: right;
+  font-size: 18px;
+  height: 30px;
+  width: 30px;
+  margin: 10px;
+  opacity: 0.8;
+  border: none;
+  background-color: transparent;
 }
 
 #canvas {
