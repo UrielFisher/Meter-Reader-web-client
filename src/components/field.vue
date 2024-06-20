@@ -28,7 +28,7 @@ export default{
   </div>
   <div v-else class="field-box">
     <div class="field">
-      <button class="symbol" @click="$router.push(`/camera/${name}`)"></button>
+      <button class="symbol" @click="$router.push(`/camera/${type[0]}/${name}`)"></button>
       <input v-model="data.final[type].reading" type="number" class="numbers" min="0" max="999999">
     </div>
   </div>

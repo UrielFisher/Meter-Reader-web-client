@@ -1,4 +1,6 @@
 <script>
+import { makeDataStore } from './../data';
+
 export default{
   name: "Camera",
   data() {
@@ -13,12 +15,23 @@ export default{
       snapButton: undefined,
     }
   },
+  computed: {
+    data() {
+      return makeDataStore(this.$route.params.name)()
+    },
+    source() {
+      if(this.$route.params.type)
+        return this.data[this.$route.params.type[0] + 'Img']
+      // else
+      //   return this.data.currentPicture
+    },
+  },
   mounted() {
     this.getElements()
 
-    navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})  
+    navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})
     .then((stream) => {
-      this.video.srcObject = stream  
+      this.video.srcObject = stream
       this.video.play()
     })
     .catch((error) => {
@@ -44,7 +57,6 @@ export default{
       "click",
       (ev) => {
         ev.preventDefault();
-        this.takePicture();
       },
       false
     );
@@ -64,7 +76,8 @@ export default{
         context.drawImage(this.video, 0, 0, this.width, this.height);
       
         const data = this.canvas.toDataURL("image/png");
-        this.picture.setAttribute("src", data);
+        //this.data.currentPicture = data
+        this.source.img = data
       } else {
         this.clearPicture();
       }
@@ -85,9 +98,9 @@ export default{
   <div id="parent">
     <canvas id="canvas"></canvas>
     <video id="video"></video>
-    <Transition name="image"><img id="picture" :key="toggleToSnap" /></Transition>
+    <Transition name="image"><img id="picture" :key="toggleToSnap" :src="this.source.img" v-if="this.source.img" /></Transition>
     <button id="backButton" @click="$router.push('/')">></button>
-    <button id="snapButton" @click="toggleToSnap=!toggleToSnap">Take picture</button>
+    <button id="snapButton" @click="takePicture(); toggleToSnap=!toggleToSnap;">Take picture</button>
   </div>
 </template>
 
@@ -115,7 +128,7 @@ export default{
 #picture {
   position: fixed;
   width: 30%;
-  height: 30vh;
+  height: fit-content;
   /* height: 100dvh; */
   outline: 5px dashed black;
   outline-offset: -5px;
@@ -126,7 +139,7 @@ export default{
 }
 
 .image-enter-active {
-  transition:  0.1s linear;
+  transition:  0.1s ease-out;
 }
 
 #snapButton {

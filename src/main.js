@@ -15,7 +15,7 @@ const routes = [
     component: Home
   },
   {
-    path: '/camera/:name',
+    path: '/camera/:type([we])?/:name?',
     name: 'Camera',
     component: Camera
   },
