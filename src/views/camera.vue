@@ -1,4 +1,6 @@
 <script>
+import { makeDataStore } from './../data';
+
 export default{
   name: "Camera",
   data() {
@@ -6,69 +8,87 @@ export default{
       height: 0,
       width: 320,
       streaming: false,
+      toggleToSnap: false,
+      video: undefined,
+      canvas: undefined,
+      picture: undefined,
+      snapButton: undefined,
     }
   },
+  computed: {
+    data() {
+      return makeDataStore(this.$route.params.name)()
+    },
+    source() {
+      if(this.$route.params.type)
+        return this.data[this.$route.params.type[0] + 'Img']
+      // else
+      //   return this.data.currentPicture
+    },
+  },
   mounted() {
-    const video = document.getElementById("video")
-    const canvas = document.getElementById("canvas")
-    const picture = document.getElementById('picture');
-    const snapButton = document.getElementById('snapButton');
-    
-    navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})  
+    this.getElements()
+
+    navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})
     .then((stream) => {
-      video.srcObject = stream  
-      video.play()
+      this.video.srcObject = stream
+      this.video.play()
     })
     .catch((error) => {
       console.log("ERROR: "+ error);
-      // this.$router.push('/')
     })
 
-    video.addEventListener(
+    this.video.addEventListener(
       "canplay",
       () => {
         if (!this.streaming) {
-          this.height = (video.videoHeight / video.videoWidth) * this.width;
+          this.height = (this.video.videoHeight / this.video.videoWidth) * this.width;
         
-          video.setAttribute("width", this.width);
-          video.setAttribute("height", this.height);
-          canvas.setAttribute("width", this.width);
-          canvas.setAttribute("height", this.height);
+          this.video.setAttribute("width", this.width);
+          this.video.setAttribute("height", this.height);
+          this.canvas.setAttribute("width", this.width);
+          this.canvas.setAttribute("height", this.height);
           this.streaming = true;
         }
       },
       {once: true},
     );
-    snapButton.addEventListener(
+    this.snapButton.addEventListener(
       "click",
       (ev) => {
         ev.preventDefault();
-        this.takePicture();
       },
       false
     );
   },
   methods: {
+    getElements() {
+      this.video = document.getElementById("video")
+      this.canvas = document.getElementById("canvas")
+      this.picture = document.getElementById('picture');
+      this.snapButton = document.getElementById('snapButton');
+    },
     takePicture() {
-      const context = canvas.getContext("2d");
+      const context = this.canvas.getContext("2d");
       if (this.width && this.height) {
-        canvas.width = this.width;
-        canvas.height = this.height;
-        context.drawImage(video, 0, 0, this.width, this.height);
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
+        context.drawImage(this.video, 0, 0, this.width, this.height);
       
-        const data = canvas.toDataURL("image/png");
-        picture.setAttribute("src", data);
+        const data = this.canvas.toDataURL("image/png");
+        //this.data.currentPicture = data
+        this.source.img = data
       } else {
         this.clearPicture();
       }
     },
     clearPicture() {
-      const context = canvas.getContext("2d");
+      const context = this.canvas.getContext("2d");
       context.fillStyle = "#AAA";
-      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-      const data = canvas.toDataURL("image/png");
-      picture.setAttribute("src", data);
+      const data = this.canvas.toDataURL("image/png");
+      this.picture.setAttribute("src", data);
     },
   },
 }
@@ -76,23 +96,24 @@ export default{
 
 <template>
   <div id="parent">
-    <video id="video"></video>
-    <img id="picture" />
-    <button id="snapButton">Take picture</button>
     <canvas id="canvas"></canvas>
+    <video id="video"></video>
+    <Transition name="image"><img id="picture" :key="toggleToSnap" :src="this.source.img" v-if="this.source.img" /></Transition>
+    <button id="backButton" @click="$router.push('/')">></button>
+    <button id="snapButton" @click="takePicture(); toggleToSnap=!toggleToSnap;">Take picture</button>
   </div>
 </template>
 
 <style scoped>
 #parent {
-  /* display: flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
-  position: fixed;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  /* position: fixed; */
   height: 100vh;
   height: 100dvh;
-  outline: 5px dashed red;
-  outline-offset: -5px;
+  /* outline: 5px dashed red;
+  outline-offset: -5px; */
 }
 
 #video {
@@ -100,28 +121,46 @@ export default{
   width: 100%;
   height: 100vh;
   height: 100dvh;
-  outline: 3px dashed blue;
+  /* outline: 3px dashed blue; */
   outline-offset: -3px;
 }
 
 #picture {
   position: fixed;
-  width: 100%;
-  height: 100vh;
+  width: 30%;
+  height: fit-content;
   /* height: 100dvh; */
-  outline: 10px dashed black;
-  outline-offset: -10px;
+  outline: 5px dashed black;
+  outline-offset: -5px;
+}
+
+.image-enter-from {
+  transform: scale(calc(20/3));
+}
+
+.image-enter-active {
+  transition:  0.1s ease-out;
 }
 
 #snapButton {
   position: fixed;
-  bottom: 10vh;
   width: 10vh;
   height: 10vh;
+  bottom: 10vh;
   left: calc(50vw - 5vh);
   border-radius: 50px;
-  outline: 3px dashed orange;
-  outline-offset: -3px;
+  /* outline: 3px dashed orange; */
+}
+
+#backButton {
+  float: right;
+  font-size: 18px;
+  height: 30px;
+  width: 30px;
+  margin: 10px;
+  opacity: 0.8;
+  border: none;
+  background-color: transparent;
 }
 
 #canvas {

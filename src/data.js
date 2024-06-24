@@ -4,6 +4,8 @@ export const makeDataStore = (name) => {
   const useDataStore = defineStore(name, {
     state: () => ({
       total: 0,
+      eImg: {img: null,value: null},
+      wImg: {img: null,value: null},
       final: {
         electricity: {
           reading: null,
