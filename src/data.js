@@ -19,7 +19,7 @@ export const makeDataStore = (name) => {
         },
         gas: {
           rate: null,
-          amount: 0,
+          amount: '0',
           sum: null,
         },
         sewer: {
