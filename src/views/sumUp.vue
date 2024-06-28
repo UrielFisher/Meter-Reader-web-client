@@ -5,16 +5,6 @@ import SumMajor from './../components/sumMajor.vue'
 export default {
   name: "SumUp",
   components: {SumMajor},
-  data() {
-    return {
-      // inputData: {
-      //   eReading: 12345,
-      //   wReading: 678,
-      //   gas: 0,
-      //   sewer: false,
-      // },
-    }
-  },
   computed: {
     data() {
       return makeDataStore(this.$route.params.name)()
