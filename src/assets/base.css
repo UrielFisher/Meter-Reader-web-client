@@ -1,3 +1,7 @@
+:root p, input, label{
+  font-size: 12px;
+}
+
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --vt-c-white: #ffffff;
