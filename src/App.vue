@@ -26,7 +26,7 @@ export default{
   methods: {
     ocr(b64) {
       this.json.requests[0].image.content = b64
-      fetch("https://vision.googleapis.com/v1/images:annotate",{
+      fetch(`https://vision.googleapis.com/v1/images:annotate?key=${import.meta.env.VITE_KEY}`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -34,15 +34,16 @@ export default{
         body: JSON.stringify(this.json)
       })
       .then(data=> data.json())
+      .then(data => data.responses[0])
       .then((data) => {console.log(data)})
       .catch(()=>{console.log("failure");})
     },
     getImageAsBase64(imagePath) {
-      fetch('http://localhost:5173/src/assets/google-ocr-sign.jpg')
+      fetch("http://localhost:5173/src/assets/google-ocr-sign.jpg")
         .then(response => response.blob())
         .then(blob => {
           var reader = new FileReader();
-          reader.onload = function() {
+          reader.onload = () => {
             const b64 = reader.result.split(',')[1];
             if(b64) {
               this.ocr(b64)
