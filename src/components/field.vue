@@ -1,15 +1,16 @@
 <script>
-import { makeDataStore } from './../data';
+import { mapStores, mapWritableState } from 'pinia';
+import { useMainStore } from './../stores/main.js'
+import { makeIndividualStore } from '../stores/individual';
 
 export default{
   name: "Field",
   props: ["type", "name"],
   computed: {
+    // ...mapWritableState(useMainStore, ['stores']),
     data() {
-      return makeDataStore(this.name)()
+      return makeIndividualStore(this.name)()
     }
-  },
-  mounted() {
   },
 }
 </script>

@@ -1,5 +1,5 @@
 <script>
-import { makeDataStore } from './../data';
+import { makeIndividualStore } from '../stores/individual';
 
 export default{
   name: "Camera",
@@ -17,7 +17,7 @@ export default{
   },
   computed: {
     data() {
-      return makeDataStore(this.$route.params.name)()
+      return makeIndividualStore(this.$route.params.name)()
     },
     source() {
       if(this.$route.params.type)
@@ -78,6 +78,7 @@ export default{
         const data = this.canvas.toDataURL("image/png");
         //this.data.currentPicture = data
         this.source.img = data
+        this.data.ocr(data)
       } else {
         this.clearPicture();
       }

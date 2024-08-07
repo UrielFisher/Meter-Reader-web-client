@@ -1,22 +1,28 @@
 <script>
+import { mapActions, mapState, mapWritableState } from 'pinia';
+import { useMainStore } from './../stores/main'
 import Indiv from './../components/indiv.vue'
+import { makeIndividualStore } from '@/stores/individual';
 
 export default{
   name: "Home",
   components: {Indiv},
-  data() {
-    return {
-      // get user specific
-      array: ["ידז","עגד גשדשד","גדכגדשד"],
-    }
+  computed: {
+    ...mapWritableState(useMainStore, ['stores']),
   },
+  methods: {
+    ...mapActions(useMainStore, ['initStores']),
+  },
+  mounted() {
+    // this.initStores()
+  }
 }
 </script>
 
 <template>
   <div class="parent">
     <div id="container">
-      <Indiv v-for="name in this.array" class="individual" :name="name" :key="name">
+      <Indiv v-for="name in this.individualsArray" class="individual" :name="name" :key="name">
       </Indiv>
     </div>
   </div>

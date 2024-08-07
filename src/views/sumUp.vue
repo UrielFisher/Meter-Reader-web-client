@@ -1,13 +1,15 @@
 <script>
-import { makeDataStore } from './../data.js'
+import { mapWritableState } from 'pinia';
+import { useMainStore } from '../stores/main.js'
 import SumMajor from './../components/sumMajor.vue'
 // delete sewer data before save if irrelevant
 export default {
   name: "SumUp",
   components: {SumMajor},
   computed: {
+    ...mapWritableState(useMainStore, ['stores']),
     data() {
-      return makeDataStore(this.$route.params.name)()
+      return this.stores[this.$route.params.name]
     },
     date() {
       // return new Date().toISOstring   .split("T")[0]
