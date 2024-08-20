@@ -24,15 +24,15 @@ export const useMainStore = defineStore('main', {
     wRate: null,
   }),
   // getters: {
-  //   stores: () => ({
-
-  //   })
+  //   currentStore: (state) => {
+  //     return state.stores
+  //   }
   // },
   actions: {
     initStores() {
       for(let individual of this.individualsArray) {
-        // if(!Object.keys(this.stores).includes(individual))
-        this.stores[individual] = makeIndividualStore(individual)()
+        if(!Object.keys(this.stores).includes(individual))
+          this.stores[individual] = makeIndividualStore(individual)()
       }
     },
     async ocr(b64) {

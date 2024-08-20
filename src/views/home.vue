@@ -1,20 +1,19 @@
 <script>
-import { mapActions, mapState, mapWritableState } from 'pinia';
+import { mapActions, mapState } from 'pinia';
 import { useMainStore } from './../stores/main'
 import Indiv from './../components/indiv.vue'
-import { makeIndividualStore } from '@/stores/individual';
 
 export default{
   name: "Home",
   components: {Indiv},
   computed: {
-    ...mapWritableState(useMainStore, ['stores']),
+    ...mapState(useMainStore, ['individualsArray', 'stores']),
   },
   methods: {
     ...mapActions(useMainStore, ['initStores']),
   },
-  mounted() {
-    // this.initStores()
+  created() {
+    this.initStores()
   }
 }
 </script>

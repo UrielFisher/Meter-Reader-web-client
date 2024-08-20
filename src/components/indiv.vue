@@ -1,7 +1,4 @@
 <script>
-import { mapStores } from 'pinia';
-import { useMainStore } from './../stores/main'
-import { makeIndividualStore } from '@/stores/individual';
 import Field from './field.vue'
 
 export default{
@@ -13,12 +10,6 @@ export default{
       fields: ["name", "electricity", "water", "gas"],
     }
   },
-  computed: {
-    ...mapStores(useMainStore)
-  },
-  mounted() {
-    this.mainStore.store[this.name] = makeIndividualStore(this.name);
-  }
 }
 </script>
 

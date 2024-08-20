@@ -30,6 +30,7 @@ export const makeIndividualStore = (name) => {
       } // reset and fetch
     }),
   })
+  
   import.meta.hot?.accept(acceptHMRUpdate(useIndividualStore, import.meta.hot))
   return useIndividualStore
 }

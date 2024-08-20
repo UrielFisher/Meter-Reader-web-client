@@ -1,5 +1,5 @@
 <script>
-import { mapStores, mapWritableState } from 'pinia';
+import { mapState } from 'pinia';
 import { useMainStore } from './../stores/main.js'
 import { makeIndividualStore } from '../stores/individual';
 
@@ -7,9 +7,9 @@ export default{
   name: "Field",
   props: ["type", "name"],
   computed: {
-    // ...mapWritableState(useMainStore, ['stores']),
+    ...mapState(useMainStore, ['stores']),
     data() {
-      return makeIndividualStore(this.name)()
+      return this.stores[this.name]
     }
   },
 }
