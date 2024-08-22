@@ -1,15 +1,16 @@
 <script>
-import { makeDataStore } from './../data';
+import { mapState } from 'pinia';
+import { useMainStore } from './../stores/main.js'
+import { makeIndividualStore } from '../stores/individual';
 
 export default{
   name: "Field",
   props: ["type", "name"],
   computed: {
+    ...mapState(useMainStore, ['stores']),
     data() {
-      return makeDataStore(this.name)()
+      return this.stores[this.name]
     }
-  },
-  mounted() {
   },
 }
 </script>
@@ -24,11 +25,12 @@ export default{
       <option value="0">0</option>
       <option value="1">1</option>
       <option value="2">2</option>
+      <option value="3">3</option>
     </select>
   </div>
   <div v-else class="field-box">
     <div class="field">
-      <button class="symbol"></button>
+      <button class="symbol" @click="$router.push(`/camera/${type[0]}/${name}`)"></button>
       <input v-model="data.final[type].reading" type="number" class="numbers" min="0" max="999999">
     </div>
   </div>

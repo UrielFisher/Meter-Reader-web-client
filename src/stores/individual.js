@@ -1,9 +1,11 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
 
-export const makeDataStore = (name) => {
-  const useDataStore = defineStore(name, {
+export const makeIndividualStore = (name) => {
+  const useIndividualStore = defineStore(name, {
     state: () => ({
       total: 0,
+      eImg: {img: null,value: null},
+      wImg: {img: null,value: null},
       final: {
         electricity: {
           reading: null,
@@ -17,7 +19,7 @@ export const makeDataStore = (name) => {
         },
         gas: {
           rate: null,
-          amount: 0,
+          amount: '0',
           sum: null,
         },
         sewer: {
@@ -26,8 +28,9 @@ export const makeDataStore = (name) => {
           sum: null,
         }
       } // reset and fetch
-    })
+    }),
   })
-  import.meta.hot?.accept(acceptHMRUpdate(useDataStore, import.meta.hot))
-  return useDataStore
+  
+  import.meta.hot?.accept(acceptHMRUpdate(useIndividualStore, import.meta.hot))
+  return useIndividualStore
 }
