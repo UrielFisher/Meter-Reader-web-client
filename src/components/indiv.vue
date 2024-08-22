@@ -1,5 +1,4 @@
 <script>
-import { makeDataStore } from '../data.js'
 import Field from './field.vue'
 
 export default{
