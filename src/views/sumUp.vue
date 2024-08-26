@@ -1,23 +1,15 @@
 <script>
-import { makeDataStore } from './../data.js'
+import { mapWritableState } from 'pinia';
+import { useMainStore } from '../stores/main.js'
 import SumMajor from './../components/sumMajor.vue'
 // delete sewer data before save if irrelevant
 export default {
   name: "SumUp",
   components: {SumMajor},
-  data() {
-    return {
-      // inputData: {
-      //   eReading: 12345,
-      //   wReading: 678,
-      //   gas: 0,
-      //   sewer: false,
-      // },
-    }
-  },
   computed: {
+    ...mapWritableState(useMainStore, ['stores']),
     data() {
-      return makeDataStore(this.$route.params.name)()
+      return this.stores[this.$route.params.name]
     },
     date() {
       // return new Date().toISOstring   .split("T")[0]
@@ -54,7 +46,7 @@ export default {
     },
     total: {
       handler() {
-        this.data.final.total = this.total
+        this.data.total = this.total
       },
       immediate: true
     },
@@ -81,7 +73,7 @@ export default {
             <h5 class="partTitle">מים</h5>
             <SumMajor class="partBody" type="water" />
           </div>
-          <div class="part" id="gas" v-if="data.final.gas.amount !== 0">
+          <div class="part" id="gas" v-if="data.final.gas.amount !== '0'">
             <h5 class="partTitle">גז</h5>
             <p class="partBody subTotal">{{data.final.gas.amount * data.final.gas.rate}} = {{data.final.gas.rate}} • {{data.final.gas.amount}}</p>
           </div>

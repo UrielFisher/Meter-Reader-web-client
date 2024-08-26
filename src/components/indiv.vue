@@ -1,5 +1,4 @@
 <script>
-import { makeDataStore } from '../data.js'
 import Field from './field.vue'
 
 export default{
@@ -9,12 +8,6 @@ export default{
   data() {
     return {
       fields: ["name", "electricity", "water", "gas"],
-      na: 'ידז',
-    }
-  },
-  computed: {
-    data() {
-      return makeDataStore(this.$route.params.name)()
     }
   },
 }

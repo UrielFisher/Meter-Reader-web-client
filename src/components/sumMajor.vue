@@ -1,5 +1,6 @@
 <script>
-import { makeDataStore } from './../data.js'
+import { mapState } from 'pinia'
+import { useMainStore } from '../stores/main.js'
 
 export default {
   name: "SumMajor",
@@ -10,8 +11,9 @@ export default {
     }
   },
   computed: {
+    ...mapState(useMainStore, ['stores']),
     data() {
-      return makeDataStore(this.$route.params.name)()
+      return this.stores[this.$route.params.name]
     },
     t() { return this.data.final[this.type] },
     subtract() {
