@@ -22,6 +22,7 @@ export const useMainStore = defineStore('main', {
     individualsArray: ["ידז","עגד גשדשד","גדכגדשד"],
     eRate: null,
     wRate: null,
+    currentPicture: null,  // not benefitial without history, but may be filled from 'camera' on route errors
   }),
   // getters: {
   //   currentStore: (state) => {
@@ -48,7 +49,7 @@ export const useMainStore = defineStore('main', {
       })
       .then(data=> data.json())
       .then(data => data.responses[0])
-      .then((data) => {console.log(data)})
+      .then((data) => {console.log(data); return data;})
       .catch(()=>{console.log("failure");})
     }
   }
