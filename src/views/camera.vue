@@ -82,7 +82,7 @@ export default{
         const data = this.canvas.toDataURL("image/png");
         //this.mainStore.currentPicture = data
         this.source.img = data
-        this.source.value = this.mainStore.ocr(data.replace(/^data:image\/png;base64,/, ''8))
+        this.source.value = this.mainStore.ocr(data.replace(/^data:image\/png;base64,/, ''))
       } else {
         this.clearPicture();
       }
