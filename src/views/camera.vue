@@ -19,7 +19,7 @@ export default{
   computed: {
     ...mapStores(useMainStore),
     indivStore() {
-      return mainStore.stores[this.$route.params.name]
+      return this.mainStore.stores[this.$route.params.name]
     },
     source() {
       if(this.$route.params.type)
@@ -33,7 +33,7 @@ export default{
   mounted() {
     this.getElements()
 
-    navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})
+    navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
     .then((stream) => {
       this.video.srcObject = stream
       this.video.play()
@@ -82,7 +82,7 @@ export default{
         const data = this.canvas.toDataURL("image/png");
         //this.mainStore.currentPicture = data
         this.source.img = data
-        this.source.value = this.mainStore.ocr(data)
+        this.source.value = this.mainStore.ocr(data.replace(/^data:image\/png;base64,/, ''8))
       } else {
         this.clearPicture();
       }
