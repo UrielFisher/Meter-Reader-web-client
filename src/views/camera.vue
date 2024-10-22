@@ -1,5 +1,6 @@
 <script>
-import { makeIndividualStore } from '../stores/individual';
+import { mapStores } from 'pinia';
+import { useMainStore } from './../stores/main'
 
 export default{
   name: "Camera",
@@ -16,20 +17,23 @@ export default{
     }
   },
   computed: {
-    data() {
-      return makeIndividualStore(this.$route.params.name)()
+    ...mapStores(useMainStore),
+    indivStore() {
+      return this.mainStore.stores[this.$route.params.name]
     },
     source() {
       if(this.$route.params.type)
-        return this.data[this.$route.params.type[0] + 'Img']
-      // else
-      //   return this.data.currentPicture
+        return this.indivStore[this.$route.params.type[0] + 'Img']
+      else {
+        alert("התמונה לא נשמרה, נא לפתוח עמוד זה מחדש")
+        return this.mainStore.currentPicture
+      }
     },
   },
   mounted() {
     this.getElements()
 
-    navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})
+    navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
     .then((stream) => {
       this.video.srcObject = stream
       this.video.play()
@@ -76,9 +80,9 @@ export default{
         context.drawImage(this.video, 0, 0, this.width, this.height);
       
         const data = this.canvas.toDataURL("image/png");
-        //this.data.currentPicture = data
+        //this.mainStore.currentPicture = data
         this.source.img = data
-        this.data.ocr(data)
+        this.source.value = this.mainStore.ocr(data.replace(/^data:image\/png;base64,/, ''))
       } else {
         this.clearPicture();
       }
