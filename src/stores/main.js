@@ -24,7 +24,7 @@ export const useMainStore = defineStore('main', {
     wRate: null,
 
     currentPicture: null,  // not benefitial without history, but may be filled from 'camera' on route errors
-    patternExtension: 0,  // for fractions, -----.-, each user sets manually 
+    patternExtension: 1,  // for fractions, -----.-, each user sets manually 
   }),
   // getters: {
   //   currentStore: (state) => {
@@ -48,8 +48,7 @@ export const useMainStore = defineStore('main', {
     async ocr(b64) {
       if(!b64) return
       json.requests[0].image.content = b64
-      console.log(json);
-      fetch(`https://vision.googleapis.com/v1/images:annotate?key=${import.meta.env.VITE_KEY}`,{
+      return await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${import.meta.env.VITE_KEY}`,{
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -58,25 +57,33 @@ export const useMainStore = defineStore('main', {
       })
       .then(data=> data.json())
       .then(data => data.responses[0])
-      .then((data) => {console.log(data); return data;})
-      .catch(()=>{console.log("failure");})
+      .then((data) => {return this.actualReading(data)})
+      .catch((e)=>{console.log("failure: " + e);})
     },
 
     /**
      * Takes raw data returned from OCR and initiates
      * population of data pattern with relevant results
-     * @param {Object} ocrResult 
+     * @param {Object} ocrResult
+     * @returns {Array} from @function fillPattern
      */
     actualReading(ocrResult) {
       let pattern = [undefined, undefined, undefined, undefined, undefined]
       const regex = new RegExp(`^\\d{${pattern.length},${pattern.length+this.patternExtension}}$`)
       let possibilities = []
-      for(let [annotation, index] in ocrResult.textAnnotations) {
-        if(regex.test(annotation.description))
+      for(const [index, {description}] of ocrResult.textAnnotations.entries()) {
+        if(regex.test(description))
           possibilities.push(index)
       }
+      console.log(possibilities);
+      if(!possibilities.length){
+        console.warn("No data from the image was found to fit the pattern");
+        return []
+      }
       // use 'possibilities' for getting options to compare with last reading value, and also use with multi meter reading
-      const ocrData = ocrResult.fullTextAnnotation.pages[0].blocks[possibilities[0] + 1].paragraphs[0].words[0].symbols.slice(0,pattern.length)
+      console.log(ocrResult.fullTextAnnotation.pages[0].blocks);
+      
+      const ocrData = ocrResult.fullTextAnnotation.pages[0].blocks[possibilities[0] - 1].paragraphs[0].words[0].symbols.slice(0,pattern.length)
       return this.fillPattern(pattern, ocrData)
     },
 
@@ -137,7 +144,7 @@ export const useMainStore = defineStore('main', {
      */
     centerPoint(vertices) {
       let [x, y] = [0, 0]
-      for (vertex of vertices) {
+      for (const vertex of vertices) {
         x += vertex?.x ?? 0
         y += vertex?.y ?? 0
       }

@@ -23,7 +23,7 @@ export default{
     },
     source() {
       if(this.$route.params.type)
-        return this.indivStore[this.$route.params.type[0] + 'Img']
+        return this.indivStore[this.$route.params.type + 'Img']
       else {
         alert("התמונה לא נשמרה, נא לפתוח עמוד זה מחדש")
         return this.mainStore.currentPicture
@@ -72,7 +72,7 @@ export default{
       this.picture = document.getElementById('picture');
       this.snapButton = document.getElementById('snapButton');
     },
-    takePicture() {
+    async takePicture() {
       const context = this.canvas.getContext("2d");
       if (this.width && this.height) {
         this.canvas.width = this.width;
@@ -82,7 +82,9 @@ export default{
         const data = this.canvas.toDataURL("image/png");
         //this.mainStore.currentPicture = data
         this.source.img = data
-        this.source.value = this.mainStore.ocr(data.replace(/^data:image\/png;base64,/, ''))
+        this.source.value = await this.mainStore.ocr(data.replace(/^data:image\/png;base64,/, ''))
+        const type = this.$route.params.type==="e" ? "electricity" : "water"
+        this.indivStore.final[type].reading = this.source.value?.join('')
       } else {
         this.clearPicture();
       }
