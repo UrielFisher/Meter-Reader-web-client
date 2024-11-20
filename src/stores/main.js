@@ -20,12 +20,12 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     stores: {},
     individualsArray: ["ידז","עגד גשדשד","גדכגדשד"],
+
     eRate: null,
     wRate: null,
-
-    currentPicture: null,  // not benefitial without history, but may be filled from 'camera' on route errors
     patternLength: 5,
-    patternExtension: 1,  // for fractions, -----.-, each user sets manually 
+    patternExtension: 1,  // for fractions, -----.-, each user sets manually
+    currentPicture: null,  // not benefitial without history, but may be filled from 'camera' on route errors
   }),
   // getters: {
   //   currentStore: (state) => {
@@ -58,7 +58,7 @@ export const useMainStore = defineStore('main', {
       })
       .then(data=> data.json())
       .then(data => data.responses[0])
-      .then((data) => {return this.actualReading(data)})
+      .then(data => this.actualReading(data))
       .catch((e)=>{console.log("failure: " + e);})
     },
 

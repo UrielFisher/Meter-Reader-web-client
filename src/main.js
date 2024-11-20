@@ -7,6 +7,7 @@ import App from './App.vue'
 import Home from './views/home.vue'
 import Camera from './views/camera.vue'
 import SumUp from './views/sumUp.vue'
+import Settings from './views/settings.vue'
 
 const routes = [
   {
@@ -23,6 +24,11 @@ const routes = [
     path: '/sumup/:name',
     name: 'SumUp',
     component: SumUp
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings
   },
 ]
 

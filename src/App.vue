@@ -41,4 +41,15 @@ export default{
   height: 100%;
   width: 100%;
 }
+
+.backButton {
+  float: right;
+  font-size: 18px;
+  height: 30px;
+  width: 30px;
+  margin: 10px;
+  opacity: 0.8;
+  border: none;
+  background-color: transparent;
+}
 </style>
