@@ -36,9 +36,6 @@ export default {
       },
       immediate: true
     }
-  },
-  mounted() {
-    console.log("h");
   }
 }
 </script>
