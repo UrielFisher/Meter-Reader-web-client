@@ -9,7 +9,8 @@ export default {
   name: "SumUp",
   components: {SumMajor},
   data: () => ({
-    canShare: false
+    canShare: false,
+    wasDownloaded: false
   }),
   computed: {
     ...mapWritableState(useMainStore, ['stores']),
@@ -37,14 +38,32 @@ export default {
     },
   },
   methods: {
-    async shareImage() {
+    async getFile() {
       const paper = this.$refs.paper
-
       const blob = await htmlToImage.toBlob(paper)
-      const file = new File([blob], "חשבון.png", {type: blob.type})
-
+      return new File([blob], this.$route.params.name + ".png", {type: blob.type})
+    },
+    async shareImage() {
+      const file = await this.getFile()
       if(navigator.canShare({files: [file]}))
         navigator.share({files: [file]})
+    },
+    async download() {
+      const file = await this.getFile()
+      const link = window.URL.createObjectURL(file)
+      let a = document.createElement("a")
+      a.href = link
+      a.setAttribute("download", '')
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(link)
+      this.wasDownloaded = true
+    },
+    async whatsapp() {
+      if(!this.wasDownloaded)
+        await this.download()
+      window.open("https://wa.me/" + '')
     }
   },
   watch: {
@@ -111,8 +130,8 @@ export default {
     </div>
     <footer id="shareBar">
       <button class="shareBtn" @click="shareImage" v-if="canShare">Share</button>
-      <button class="shareBtn" >Download</button>
-      <button class="shareBtn" >WhatsApp</button>
+      <button class="shareBtn" @click="download">Download</button>
+      <button class="shareBtn" @click="whatsapp">WhatsApp</button>
     </footer>
   </div>
 </template>

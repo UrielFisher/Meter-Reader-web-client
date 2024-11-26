@@ -50,7 +50,7 @@ export default {
     <p class="data line enil">{{ subtract }}</p>
     <label class="hint">
       לפי
-      <input type="number" v-model="t.rate" style="width: 50px;">
+      <input type="number" v-model="t.rate" style="width: 50px; background-color: transparent">
     </label>
     <p v-if="this.type !== 'water'" class="data">{{ by }}</p>
     <p v-if="this.type !== 'water'" class="hint">17%+</p>
