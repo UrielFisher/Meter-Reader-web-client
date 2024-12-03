@@ -13,9 +13,12 @@ export default {
     wasDownloaded: false
   }),
   computed: {
-    ...mapWritableState(useMainStore, ['stores']),
+    ...mapWritableState(useMainStore, ['stores', 'individuals']),
+    name() {
+      return this.$route.params.name
+    },
     data() {
-      return this.stores[this.$route.params.name]
+      return this.stores[this.name]
     },
     date() {
       // return new Date().toISOstring   .split("T")[0]
@@ -41,7 +44,7 @@ export default {
     async getFile() {
       const paper = this.$refs.paper
       const blob = await htmlToImage.toBlob(paper)
-      return new File([blob], this.$route.params.name + ".png", {type: blob.type})
+      return new File([blob], this.name + ".png", {type: blob.type})
     },
     async shareImage() {
       const file = await this.getFile()
@@ -63,7 +66,7 @@ export default {
     async whatsapp() {
       if(!this.wasDownloaded)
         await this.download()
-      window.open("https://wa.me/" + '')
+      window.open("https://wa.me/" + this.individuals[this.name].pstn)
     }
   },
   watch: {
