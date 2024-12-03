@@ -2,10 +2,16 @@
 import { mapWritableState } from 'pinia';
 import { useMainStore } from '../stores/main.js'
 import SumMajor from './../components/sumMajor.vue'
+import * as htmlToImage from 'html-to-image'
+import { toBlob } from 'html-to-image'
 // delete sewer data before save if irrelevant
 export default {
   name: "SumUp",
   components: {SumMajor},
+  data: () => ({
+    canShare: false,
+    wasDownloaded: false
+  }),
   computed: {
     ...mapWritableState(useMainStore, ['stores']),
     data() {
@@ -31,6 +37,35 @@ export default {
       return [2, 3, 4]
     },
   },
+  methods: {
+    async getFile() {
+      const paper = this.$refs.paper
+      const blob = await htmlToImage.toBlob(paper)
+      return new File([blob], this.$route.params.name + ".png", {type: blob.type})
+    },
+    async shareImage() {
+      const file = await this.getFile()
+      if(navigator.canShare({files: [file]}))
+        navigator.share({files: [file]})
+    },
+    async download() {
+      const file = await this.getFile()
+      const link = window.URL.createObjectURL(file)
+      let a = document.createElement("a")
+      a.href = link
+      a.setAttribute("download", '')
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(link)
+      this.wasDownloaded = true
+    },
+    async whatsapp() {
+      if(!this.wasDownloaded)
+        await this.download()
+      window.open("https://wa.me/" + '')
+    }
+  },
   watch: {
     gasTotal: {
       handler() {
@@ -51,14 +86,16 @@ export default {
       immediate: true
     },
   },
-  methods: {
-  },
+  created() {
+    if(navigator.canShare({text: ""}))
+      this.canShare = true
+  }
 }
 </script>
 
 <template>
   <div class="parent">
-    <div id="paper">
+    <div id="paper" ref="paper">
       <div id="header">
         <h3 id="name">אוריאל פישר</h3>
         <input id="date" placeholder="תאריך:" :value="date"></input>
@@ -91,6 +128,11 @@ export default {
         </span>
       </div>
     </div>
+    <footer id="shareBar">
+      <button class="shareBtn" @click="download"></button>
+      <button class="shareBtn" @click="shareImage" v-if="canShare">Share</button>
+      <button class="shareBtn" @click="whatsapp"></button>
+    </footer>
   </div>
 </template>
 
@@ -164,6 +206,34 @@ export default {
   width: fit-content;
   border-top: 1px solid black;
   border-bottom: 3px double black;
+}
+
+#shareBar {
+  position: fixed;
+  bottom: 0;
+  height: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: lightsteelblue;
+}
+
+.shareBtn {
+  height: 80%;
+  aspect-ratio: 1/1;
+  border-radius: 10px;
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
+.shareBtn:last-child {
+  background-image: url("./../assets/img/whatsapp_logo_green.png");
+}
+
+.shareBtn:first-child {
+  background-image: url("./../assets/img/download.svg");
 }
 </style>
 
