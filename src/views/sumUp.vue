@@ -131,7 +131,7 @@ export default {
     <footer id="shareBar">
       <button class="shareBtn" @click="shareImage" v-if="canShare">Share</button>
       <button class="shareBtn" @click="download">Download</button>
-      <button class="shareBtn" @click="whatsapp">WhatsApp</button>
+      <button class="shareBtn" @click="whatsapp"></button>
     </footer>
   </div>
 </template>
@@ -221,7 +221,15 @@ export default {
 
 .shareBtn {
   height: 80%;
-  border-radius: 50px;
+  aspect-ratio: 1/1;
+  border-radius: 10px;
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+}
+
+.shareBtn:last-child {
+  background-image: url("./../assets/img/whatsapp_logo_green.png");
 }
 </style>
 
