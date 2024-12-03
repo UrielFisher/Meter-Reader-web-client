@@ -19,7 +19,7 @@ let json = {
 export const useMainStore = defineStore('main', {
   state: () => ({
     stores: {},
-    individualsArray: ["ידז","עגד גשדשד","גדכגדשד"],
+    individuals: {"ידז": {pstn:"0504568712"}, "עגד גשדשד": {pstn:"0541135467"},"גדכגדשד": {pstn:"0581234567"}},
     eRate: null,
     wRate: null,
 
@@ -35,7 +35,7 @@ export const useMainStore = defineStore('main', {
   actions: {
     // Initiates the stores for all saved individuals
     initStores() {
-      for(let individual of this.individualsArray) {
+      for(const individual in this.individuals) {
         if(!Object.keys(this.stores).includes(individual))
           this.stores[individual] = makeIndividualStore(individual)()
       }
