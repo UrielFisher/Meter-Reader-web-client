@@ -129,8 +129,8 @@ export default {
       </div>
     </div>
     <footer id="shareBar">
+      <button class="shareBtn" @click="download"></button>
       <button class="shareBtn" @click="shareImage" v-if="canShare">Share</button>
-      <button class="shareBtn" @click="download">Download</button>
       <button class="shareBtn" @click="whatsapp"></button>
     </footer>
   </div>
@@ -230,6 +230,10 @@ export default {
 
 .shareBtn:last-child {
   background-image: url("./../assets/img/whatsapp_logo_green.png");
+}
+
+.shareBtn:first-child {
+  background-image: url("./../assets/img/download.svg");
 }
 </style>
 
