@@ -1,12 +1,12 @@
 <script>
 import { markRaw } from 'vue';
 import { useMainStore } from './../stores/main.js';
-import { mapWritableState } from 'pinia';
+import { mapStores } from 'pinia';
 
 export default{
   name: "Settings",
   computed: {
-    ...mapWritableState(useMainStore, ['eRate', 'wRate', 'patternLength', 'patternExtension'])
+    ...mapStores(useMainStore)
   },
   data() {
     return {
@@ -18,6 +18,10 @@ export default{
         {
           variableName: "wRate",
           text: "תעריף מים:‏"
+        },
+        {
+          variableName: "gRate",
+          text: "מחיר בלון גז:‏"
         },
         {
           variableName: "patternLength",
@@ -38,6 +42,11 @@ export default{
     }
   },
   methods: {
+    addIndividual() {},
+    editIndividual() {},
+    deleteIndividual() {
+      confirm("Are you sure aboute deleting individual?")
+    },
     openEditor(index) {
       if(this.showEditor) {
         this[this.showEditor] = this.value
@@ -54,10 +63,10 @@ export default{
       this[this.showEditor] = this.value
       this.showEditor = ''
     },
-    checkAlreadyOpen(index) {
+    ifAlreadyOpen(index) {
       if(this.showEditor !== this.settings[index].variableName)
         this.closeEditor()
-    }
+    },
   },
 }
 </script>
@@ -68,9 +77,32 @@ export default{
     <Transition>
       <input type="number" autocomplete="off" id="editor" ref="editor" @click.stop :key="showEditor" v-if="showEditor" v-model="value" />
     </Transition>
-    <div @click.stop="checkAlreadyOpen(ind)" @dblclick="openEditor(ind)" class="field" :key="ind" v-for="setting, ind of settings">
-      <p class="text">{{this[setting.variableName]}}</p>
-      <p class="text">{{setting.text}}</p>
+    <table>
+      <tr v-for="indiv of mainStore.individualsArray">
+        <td class="delete-cell">
+          <button @click="deleteIndividual" class="delete-btn">🗑️</button>
+        </td>
+        <td>
+          <input class="table-input" :value="indiv"/>
+        </td>
+      </tr>
+      <tr>
+        <td @click="addIndividual" colspan="2" class="add-indiv">+</td>
+      </tr>
+    </table>
+    <!-- <div>
+      <div v-for="indiv of mainStore.individualsArray">
+        <div>
+          <p v-for="property of indiv">{{ property }}</p>
+        </div>
+      </div>
+    </div> -->
+    <div v-for="setting, ind of settings" class="field">
+      <div @click.stop="ifAlreadyOpen(ind)" @dblclick="openEditor(ind)" class="field-grid" :key="ind">
+        <p class="text">{{mainStore[setting.variableName]}}</p>
+        <p class="text">{{setting.text}}</p>
+      </div>
+      <div class="breakElement"></div>
     </div>
   </div>
 </template>
@@ -84,17 +116,20 @@ export default{
 }
 
 .field {
-  width: calc(100% / 3 * 2);
+  position: relative;
   height: 15%;
-  margin-block: 10px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
+  width: 100%;
+}
+
+.field-grid {
+  display: flex;
+  height: 100%;
 }
 
 .text {
-  display: inline;
-  margin-inline: auto;
+  flex: 1 1 0px;
+  text-align: center;
+  align-content: center;
   font-size: 1rem;
   user-select: none;
 }
@@ -112,6 +147,11 @@ export default{
   font-weight: bold;
 }
 
+.breakElement {
+  height: 3px;
+  background-image: linear-gradient(to right, transparent 5%, lightgray 20% 80%, transparent 95%);
+}
+
 .v-enter-from, .v-leave-to {
   transform: translateY(calc(-150%));
 }
@@ -127,5 +167,41 @@ export default{
 
 .v-leave-active {
   transition: all 1s cubic-bezier(0, 0, 0, 1);
+}
+
+table {
+  width: 100%;
+}
+
+td {
+  text-align: right;
+}
+
+.table-input {
+  height: 100%;
+  width: 100%;
+  border: none;
+  text-align: right
+}
+
+.table-input:focus-visible {
+  outline: none;
+}
+
+.delete-cell {
+  width: 3rem;
+}
+
+.delete-btn {
+  height: 3rem;
+  width: 3rem;
+  font-size: 1em;
+  border : 5px outset red;
+  background-color: red;
+}
+
+.add-indiv {
+  text-align: center;
+  background-image: linear-gradient(to right, transparent 5%, lightgray 20% 80%, transparent 95%);
 }
 </style>

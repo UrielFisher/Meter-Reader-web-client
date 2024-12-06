@@ -23,6 +23,7 @@ export const useMainStore = defineStore('main', {
 
     eRate: null,
     wRate: null,
+    gRate: null,
     patternLength: 5,
     patternExtension: 1,  // for fractions, -----.-, each user sets manually
     currentPicture: null,  // not benefitial without history, but may be filled from 'camera' on route errors
