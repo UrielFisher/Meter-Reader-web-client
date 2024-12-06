@@ -86,6 +86,8 @@ export default{
         this.source.value = await this.mainStore.ocr(rawData)
         const type = this.$route.params.type==="e" ? "electricity" : "water"
         this.indivStore.final[type].reading = this.source.value?.join('')
+        if(!this.source.value.includes(undefined))
+          this.$router.push('/')
       } else {
         this.clearPicture();
       }

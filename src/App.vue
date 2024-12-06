@@ -4,7 +4,7 @@ export default{
   name: "App",
   methods: {
     getImageAsBase64(imagePath) {
-      fetch("http://localhost:5173/src/assets/google-ocr-sign.jpg")
+      fetch("http://localhost:5173/src/assets/img/google-ocr-sign.jpg")
         .then(response => response.blob())
         .then(blob => {
           var reader = new FileReader();
@@ -33,8 +33,8 @@ export default{
 
 <style>
 #base {
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 }
 
 .parent {
