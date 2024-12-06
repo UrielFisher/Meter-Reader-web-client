@@ -66,7 +66,7 @@ export default {
     async whatsapp() {
       if(!this.wasDownloaded)
         await this.download()
-      window.open("https://wa.me/" + this.individuals[this.name].pstn)
+      window.open("https://wa.me/" + this.individuals.find((o) => {return o.name === this.name}).pstn)
     }
   },
   watch: {
