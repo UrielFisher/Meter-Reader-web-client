@@ -2,11 +2,12 @@
 import { markRaw } from 'vue';
 import { useMainStore } from './../stores/main.js';
 import { mapStores } from 'pinia';
+import { makeIndividualStore } from '@/stores/individual.js';
 
 export default{
   name: "Settings",
   computed: {
-    ...mapStores(useMainStore)
+    ...mapStores(useMainStore),
   },
   data() {
     return {
@@ -34,6 +35,7 @@ export default{
       ]),
       showEditor: '',
       value: '',
+      individualToAdd: undefined,
     }
   },
   watch: {
@@ -42,10 +44,34 @@ export default{
     }
   },
   methods: {
-    addIndividual() {},
-    editIndividual() {},
-    deleteIndividual() {
-      confirm("Are you sure aboute deleting individual?")
+    addIndividual() {
+      if(this.individualToAdd) {
+        this.saveNewIndiv()
+      } else {
+        this.individualToAdd = {name:"", pstn:""}
+      }
+    },
+    editIndividual(indivIndex, propertyName, event) {
+      this.mainStore.individuals[indivIndex][propertyName] = event.target.value
+    },
+    deleteIndividual(indivIndex) {
+      const name = this.mainStore.individuals[indivIndex].name
+
+      if(confirm(`Are you sure aboute deleting ${name}?`)) {
+        this.mainStore.individuals.splice(indivIndex, 1)
+        this.mainStore.stores[name].$dispose()
+      }
+    },
+    saveNewIndiv() {
+      if(this.individualToAdd?.name !== ""){ 
+        this.mainStore.individuals.push(this.individualToAdd)
+        this.mainStore.stores[this.individualToAdd.name] = makeIndividualStore(this.individualToAdd.name)()
+        this.individualToAdd = undefined
+      } else {
+        // delete without saving only if line is empty
+        if(!Object.values(this.individualToAdd).some(x => x !== ''))
+          this.individualToAdd = undefined
+      }
     },
     openEditor(index) {
       if(this.showEditor) {
@@ -78,25 +104,28 @@ export default{
       <input type="number" autocomplete="off" id="editor" ref="editor" @click.stop :key="showEditor" v-if="showEditor" v-model="value" />
     </Transition>
     <table>
-      <tr v-for="indiv of mainStore.individualsArray">
+      <tr>
+        <th></th>
+        <th>שם</th>
+        <th>מספר טלפון</th>
+      </tr>
+      <tr v-for="indiv, indivIndex of mainStore.individuals">
         <td class="delete-cell">
-          <button @click="deleteIndividual" class="delete-btn">🗑️</button>
+          <button @click="deleteIndividual(indivIndex)" class="delete-btn">🗑️</button>
         </td>
-        <td>
-          <input class="table-input" :value="indiv"/>
+        <td v-for="property, propertyName in indiv">
+          <input  @change="editIndividual(indivIndex, propertyName, $event)" class="table-input" :value="property"/></td>
+      </tr>
+      <tr v-if="individualToAdd">
+        <td></td>
+        <td v-for="property, propertyName in individualToAdd">
+          <input class="table-input" v-model="individualToAdd[propertyName]"/>
         </td>
       </tr>
       <tr>
-        <td @click="addIndividual" colspan="2" class="add-indiv">+</td>
+        <td       @click="addIndividual" colspan="3" :class="individualToAdd ? 'save-indiv' : 'add-indiv'">+</td>
       </tr>
     </table>
-    <!-- <div>
-      <div v-for="indiv of mainStore.individualsArray">
-        <div>
-          <p v-for="property of indiv">{{ property }}</p>
-        </div>
-      </div>
-    </div> -->
     <div v-for="setting, ind of settings" class="field">
       <div @click.stop="ifAlreadyOpen(ind)" @dblclick="openEditor(ind)" class="field-grid" :key="ind">
         <p class="text">{{mainStore[setting.variableName]}}</p>
@@ -117,7 +146,7 @@ export default{
 
 .field {
   position: relative;
-  height: 15%;
+  height: 100px;
   width: 100%;
 }
 
@@ -171,6 +200,13 @@ export default{
 
 table {
   width: 100%;
+  padding: 5px;
+}
+
+th {
+  text-align: end;
+  text-decoration: underline;
+  font-weight: bold;
 }
 
 td {
@@ -181,7 +217,7 @@ td {
   height: 100%;
   width: 100%;
   border: none;
-  text-align: right
+  direction: rtl;
 }
 
 .table-input:focus-visible {
@@ -200,8 +236,17 @@ td {
   background-color: red;
 }
 
-.add-indiv {
+.add-indiv, .save-indiv {
   text-align: center;
+  user-select: none;
+}
+
+.add-indiv {
   background-image: linear-gradient(to right, transparent 5%, lightgray 20% 80%, transparent 95%);
+}
+
+.save-indiv {
+  background-image: linear-gradient(to right, transparent 5%, green 20% 80%, transparent 95%);
+  font-weight: bolder;
 }
 </style>
