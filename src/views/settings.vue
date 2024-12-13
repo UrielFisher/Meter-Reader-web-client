@@ -36,6 +36,7 @@ export default{
       showEditor: '',
       value: '',
       individualToAdd: undefined,
+      storesToPatchName: {},
     }
   },
   watch: {
@@ -44,16 +45,51 @@ export default{
     }
   },
   methods: {
+    /**
+     * Manages addition of new individuals.
+     * for saving, calls @function saveNewIndiv
+     */
     addIndividual() {
       if(this.individualToAdd) {
-        this.saveNewIndiv()
+        if(this.individualToAdd?.name !== ""){
+          this.saveNewIndiv()
+        } else {
+          this.checkAndCancel()
+        }
       } else {
         this.individualToAdd = {name:"", pstn:""}
       }
     },
+    // Saves individual when it's added
+     saveNewIndiv() {
+      this.mainStore.individuals.push(this.individualToAdd)
+      this.mainStore.stores[this.individualToAdd.name] = makeIndividualStore(this.individualToAdd.name)()
+      this.individualToAdd = undefined
+    },
+    // Cancel adding if entered data is empty
+    checkAndCancel() {
+      if(!Object.values(this.individualToAdd).some(x => x !== ''))
+        this.individualToAdd = undefined
+    },
     editIndividual(indivIndex, propertyName, event) {
+      // update the pinia data stores
+      if(propertyName === "name") {
+        const oldName = this.mainStore.individuals[indivIndex].name
+        const newName = event.target.value
+        if(Object.values(this.storesToPatchName).includes(oldName)) {
+          const keyName = Object.entries(this.storesToPatchName).find((x) => {x[1] === oldName})[0]
+          this.storesToPatchName[keyName] = newName
+        } else {
+          this.storesToPatchName[oldName] = newName
+        }
+      }
+      // update the individuals list
       this.mainStore.individuals[indivIndex][propertyName] = event.target.value
     },
+    /**
+     * Manages deletion of data about an individual
+     * @param {Number} indivIndex - index of indiv to delete, from mainStore.individuals
+     */
     deleteIndividual(indivIndex) {
       const name = this.mainStore.individuals[indivIndex].name
 
@@ -62,17 +98,7 @@ export default{
         this.mainStore.stores[name].$dispose()
       }
     },
-    saveNewIndiv() {
-      if(this.individualToAdd?.name !== ""){ 
-        this.mainStore.individuals.push(this.individualToAdd)
-        this.mainStore.stores[this.individualToAdd.name] = makeIndividualStore(this.individualToAdd.name)()
-        this.individualToAdd = undefined
-      } else {
-        // delete without saving only if line is empty
-        if(!Object.values(this.individualToAdd).some(x => x !== ''))
-          this.individualToAdd = undefined
-      }
-    },
+    // Opens settings field editor
     openEditor(index) {
       if(this.showEditor) {
         this[this.showEditor] = this.value
@@ -85,14 +111,34 @@ export default{
       this.value = this[this.settings[index].variableName]
       this.$nextTick().then(() => {this.$refs.editor.focus()})
     },
+    // Closes settings field editor
     closeEditor() {
       this[this.showEditor] = this.value
       this.showEditor = ''
     },
+    // Possibly closes settings field editor
     ifAlreadyOpen(index) {
       if(this.showEditor !== this.settings[index].variableName)
         this.closeEditor()
     },
+    /**
+     * Commits stacked name changes to stores
+     * @param {Object} storesToPatchName - {oldName: newName}
+     */
+    modifyStoresNames() {
+      for(let names of Object.entries(this.storesToPatchName)) {
+        if(names[0] !== names[1]) {
+          const newStore = makeIndividualStore(names[1])()
+          newStore.$state = this.mainStore.stores[names[0]].$state
+          this.mainStore.stores[names[1]] = newStore
+          this.mainStore.stores[names[0]].$dispose()
+          delete this.mainStore.stores[names[0]]
+        }
+      }
+    },
+  },
+  unmounted() {
+    this.modifyStoresNames()
   },
 }
 </script>
