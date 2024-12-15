@@ -165,7 +165,7 @@ export default{
       <tr v-if="individualToAdd">
         <td></td>
         <td v-for="property, propertyName in individualToAdd">
-          <input class="table-input" v-model="individualToAdd[propertyName]"/>
+          <input class="table-input add-input" v-model="individualToAdd[propertyName]"/>
         </td>
       </tr>
       <tr>
@@ -261,13 +261,21 @@ td {
 
 .table-input {
   height: 100%;
-  width: 100%;
+  width: fit-content;
   border: none;
   direction: rtl;
 }
 
 .table-input:focus-visible {
   outline: none;
+}
+
+.add-input {
+  height: 3rem;
+  padding: 8px;
+  background-image:
+    linear-gradient(to right, lightsteelblue, transparent 5% 95%, lightsteelblue),
+    linear-gradient(lightsteelblue, transparent 20% 80%, lightsteelblue);
 }
 
 .delete-cell {
@@ -278,7 +286,7 @@ td {
   height: 3rem;
   width: 3rem;
   font-size: 1em;
-  border : 5px outset red;
+  border: 5px outset red;
   background-color: red;
 }
 
