@@ -82,7 +82,8 @@ export default{
         const data = this.canvas.toDataURL("image/png");
         //this.mainStore.currentPicture = data
         this.source.img = data
-        this.source.value = await this.mainStore.ocr(data.replace(/^data:image\/png;base64,/, ''))
+        const rawData = data.replace(/^data:image\/png;base64,/, '')
+        this.source.value = await this.mainStore.ocr(rawData)
         const type = this.$route.params.type==="e" ? "electricity" : "water"
         this.indivStore.final[type].reading = this.source.value?.join('')
         if(!this.source.value.includes(undefined))
@@ -108,7 +109,7 @@ export default{
     <canvas id="canvas"></canvas>
     <video id="video"></video>
     <Transition name="image"><img id="picture" :key="toggleToSnap" :src="this.source.img" v-if="this.source.img" /></Transition>
-    <button id="backButton" @click="$router.push('/')">></button>
+    <button class="backButton" @click="$router.push('/')">></button>
     <button id="snapButton" @click="takePicture(); toggleToSnap=!toggleToSnap;">Take picture</button>
   </div>
 </template>
@@ -159,17 +160,6 @@ export default{
   left: calc(50vw - 5vh);
   border-radius: 50px;
   /* outline: 3px dashed orange; */
-}
-
-#backButton {
-  float: right;
-  font-size: 18px;
-  height: 30px;
-  width: 30px;
-  margin: 10px;
-  opacity: 0.8;
-  border: none;
-  background-color: transparent;
 }
 
 #canvas {
