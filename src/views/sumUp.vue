@@ -90,7 +90,7 @@ export default {
     },
   },
   created() {
-    if(navigator.canShare({text: ""}))
+    if(navigator?.canShare && navigator.canShare({text: ""}))
       this.canShare = true
   }
 }
