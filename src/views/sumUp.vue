@@ -29,11 +29,11 @@ export default {
       return this.data.final.gas.amount * this.data.final.gas.rate
     },
     sewerTotal() {
-      return this.data.final.sewer.months?.length ?? 0 * this.data.final.sewer.rate
+      return (this.data.final.sewer.months?.length ?? 0) * this.data.final.sewer.rate
     },
     total() {
-      const t = this.data.final
-      return t.electricity.sum + t.water.sum + this.gasTotal + this.sewerTotal
+      const f = this.data.final
+      return f.electricity.sum + f.water.sum + this.gasTotal + this.sewerTotal
     },
     sewerAmount() {
       // check for time in months since last bill
@@ -171,6 +171,7 @@ export default {
 }
 
 .part {
+  width: max-content;
 }
 
 .partTitle{
