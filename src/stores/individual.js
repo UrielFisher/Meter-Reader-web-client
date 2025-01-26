@@ -3,6 +3,10 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 export const makeIndividualStore = (name) => {
   const useIndividualStore = defineStore(name, {
     state: () => ({
+      name: name,
+      pstn: undefined,
+      paysForSewer: false,
+
       total: 0,
       eImg: {img: null,value: null},
       wImg: {img: null,value: null},

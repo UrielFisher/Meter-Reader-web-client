@@ -3,7 +3,6 @@ import { mapWritableState } from 'pinia';
 import { useMainStore } from '../stores/main.js'
 import SumMajor from './../components/sumMajor.vue'
 import * as htmlToImage from 'html-to-image'
-import { toBlob } from 'html-to-image'
 // delete sewer data before save if irrelevant
 export default {
   name: "SumUp",
@@ -66,7 +65,7 @@ export default {
     async whatsapp() {
       if(!this.wasDownloaded)
         await this.download()
-      window.open("https://wa.me/" + this.individuals.find((o) => {return o.name === this.name}).pstn)
+      window.open("https://wa.me/" + this.stores[this.name].pstn)
     }
   },
   watch: {

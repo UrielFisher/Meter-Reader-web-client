@@ -6,11 +6,13 @@ import { makeIndividualStore } from '@/stores/individual.js';
 
 export default{
   name: "Settings",
-  computed: {
-    ...mapStores(useMainStore),
-  },
   data() {
     return {
+      editableFields: {
+        "name": "שם",
+        "pstn": "טלפון",
+        "paysForSewer": "משלמים בעבור ביוב",
+      },
       settings: markRaw([
         {
           variableName: "eRate",
@@ -23,6 +25,10 @@ export default{
         {
           variableName: "gRate",
           text: "מחיר בלון גז:‏"
+        },
+        {
+          variableName: "sRate",
+          text: "מחיר ביוב:‏"
         },
         {
           variableName: "patternLength",
@@ -38,6 +44,9 @@ export default{
       individualToAdd: undefined,
       storesToPatchName: {},
     }
+  },
+  computed: {
+    ...mapStores(useMainStore),
   },
   watch: {
     'this.value'() {
@@ -57,47 +66,75 @@ export default{
           this.checkAndCancel()
         }
       } else {
-        this.individualToAdd = {name:"", pstn:""}
+        let baseData = Object.entries(this.editableFields)
+        baseData.map(x => x[1] = "")
+        baseData = Object.fromEntries(baseData)
+        baseData.paysForSewer = false
+        this.individualToAdd = baseData
       }
     },
+
     // Saves individual when it's added
      saveNewIndiv() {
-      this.mainStore.individuals.push(this.individualToAdd)
+      this.mainStore.individuals.push(this.individualToAdd.name)
       this.mainStore.stores[this.individualToAdd.name] = makeIndividualStore(this.individualToAdd.name)()
+      for(const property in this.individualToAdd) {
+        this.mainStore.stores[this.individualToAdd.name][property] = this.individualToAdd[property]
+      }
       this.individualToAdd = undefined
     },
-    // Cancel adding if entered data is empty
+
+    // Cancel adding individual if entered data is empty
     checkAndCancel() {
-      if(!Object.values(this.individualToAdd).some(x => x !== ''))
+      if(!Object.values(this.individualToAdd).some(x => x))
         this.individualToAdd = undefined
     },
-    editIndividual(indivIndex, propertyName, event) {
-      // update the pinia data stores
-      if(propertyName === "name") {
-        const oldName = this.mainStore.individuals[indivIndex].name
-        const newName = event.target.value
-        if(Object.values(this.storesToPatchName).includes(oldName)) {
-          const keyName = Object.entries(this.storesToPatchName).find((x) => {x[1] === oldName})[0]
-          this.storesToPatchName[keyName] = newName
-        } else {
-          this.storesToPatchName[oldName] = newName
-        }
-      }
-      // update the individuals list
-      this.mainStore.individuals[indivIndex][propertyName] = event.target.value
+
+    /**
+     * Manages editing administrative data of the individuals
+     * @param {pinia Store} indivStore - the pinia store to be changed
+     * @param {String} propertyName - the property within the store to be changed
+     * @param {Object} event - the browser's change causing event object
+     */
+    editIndividual(indivStore, propertyName, event) {
+      if(propertyName === "name")
+        this.editNameOfIndividual(indivStore, event)
+
+      if(event.target.type === "checkbox")
+        indivStore[propertyName] = event.target.checked
+      else
+        indivStore[propertyName] = event.target.value
     },
+
+    /**
+     * Handles changing a store's name
+     * @param {pinia Store} indivStore - the pinia store to be changed
+     * @param {Object} event - the browser's change causing event object
+     */
+    editNameOfIndividual(indivStore, event) {
+      const oldName = indivStore.name
+      const newName = event.target.value
+      if(Object.values(this.storesToPatchName).includes(oldName)) {
+        const keyName = Object.entries(this.storesToPatchName).find((x) => {x[1] === oldName})[0]
+        this.storesToPatchName[keyName] = newName
+      } else {
+        this.storesToPatchName[oldName] = newName
+      }
+    },
+
     /**
      * Manages deletion of data about an individual
-     * @param {Number} indivIndex - index of indiv to delete, from mainStore.individuals
+     * @param {pinia Store} indivStore - individual's store to delete
      */
-    deleteIndividual(indivIndex) {
-      const name = this.mainStore.individuals[indivIndex].name
-
-      if(confirm(`Are you sure aboute deleting ${name}?`)) {
-        this.mainStore.individuals.splice(indivIndex, 1)
-        this.mainStore.stores[name].$dispose()
+    deleteIndividual(indivStore) {
+      if(confirm(`Are you sure aboute deleting ${indivStore.name}?`)) {
+        const index = this.mainStore.individuals.indexOf(indivStore.name)
+        this.mainStore.individuals.splice(index, 1)
+        delete this.mainStore.stores[indivStore.name]
+        indivStore.$dispose()
       }
     },
+
     // Opens settings field editor
     openEditor(index) {
       if(this.showEditor) {
@@ -111,16 +148,19 @@ export default{
       this.value = this[this.settings[index].variableName]
       this.$nextTick().then(() => {this.$refs.editor.focus()})
     },
+
     // Closes settings field editor
     closeEditor() {
       this[this.showEditor] = this.value
       this.showEditor = ''
     },
+
     // Possibly closes settings field editor
     ifAlreadyOpen(index) {
       if(this.showEditor !== this.settings[index].variableName)
         this.closeEditor()
     },
+    
     /**
      * Commits stacked name changes to stores
      * @param {Object} storesToPatchName - {oldName: newName}
@@ -149,29 +189,33 @@ export default{
     <Transition>
       <input type="number" autocomplete="off" id="editor" ref="editor" @click.stop :key="showEditor" v-if="showEditor" v-model="value" />
     </Transition>
-    <table>
-      <tr>
-        <th></th>
-        <th>שם</th>
-        <th>מספר טלפון</th>
-      </tr>
-      <tr v-for="indiv, indivIndex of mainStore.individuals">
-        <td class="delete-cell">
-          <button @click="deleteIndividual(indivIndex)" class="delete-btn">🗑️</button>
-        </td>
-        <td v-for="property, propertyName in indiv">
-          <input  @change="editIndividual(indivIndex, propertyName, $event)" class="table-input" :value="property"/></td>
-      </tr>
-      <tr v-if="individualToAdd">
-        <td></td>
-        <td v-for="property, propertyName in individualToAdd">
-          <input class="table-input add-input" v-model="individualToAdd[propertyName]"/>
-        </td>
-      </tr>
-      <tr>
-        <td       @click="addIndividual" colspan="3" :class="individualToAdd ? 'save-indiv' : 'add-indiv'">+</td>
-      </tr>
-    </table>
+    <div class="fitting-y-scrollable">
+      <table>
+        <tr>
+          <th></th>
+          <th v-for="field in editableFields" style="white-space: nowrap;">{{ field }}</th>
+        </tr>
+        <tr v-for="indivStore in mainStore.stores">
+          <td class="delete-cell">
+            <button @click="deleteIndividual(indivStore)" class="delete-btn">🗑️</button>
+          </td>
+          <td v-for="propertyValue, property in editableFields">
+            <input @change="editIndividual(indivStore, property, $event)" :checked="indivStore[property]"
+            class="table-input" v-if="typeof(indivStore[property])==='boolean'"         type="checkbox"/>
+            <input @change="editIndividual(indivStore, property, $event)" :value="indivStore[property]"
+            class="table-input" v-else/>
+          </td>
+        </tr>
+        <tr v-if="individualToAdd">
+          <td></td>
+          <td v-for="propertyValue, property in individualToAdd">
+            <input class="table-input add-input" v-model="individualToAdd[property]"
+            :type="typeof(propertyValue)==='boolean' ? 'checkbox' : 'text'"/>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div @click="addIndividual" colspan="3" :class="individualToAdd ? 'save-indiv' : 'add-indiv'">+</div>
     <div v-for="setting, ind of settings" class="field">
       <div @click.stop="ifAlreadyOpen(ind)" @dblclick="openEditor(ind)" class="field-grid" :key="ind">
         <p class="text">{{mainStore[setting.variableName]}}</p>
@@ -244,9 +288,19 @@ export default{
   transition: all 1s cubic-bezier(0, 0, 0, 1);
 }
 
-table {
+.fitting-y-scrollable {
   width: 100%;
+  overflow-y: auto;
+}
+
+table {
+  table-layout: fixed;
+  min-width: 100%;
   padding: 5px;
+}
+
+tr {
+  width: fit-content;
 }
 
 th {
@@ -261,7 +315,7 @@ td {
 
 .table-input {
   height: 100%;
-  width: fit-content;
+  field-sizing: content;
   border: none;
   direction: rtl;
 }
@@ -291,6 +345,7 @@ td {
 }
 
 .add-indiv, .save-indiv {
+  width: 100%;
   text-align: center;
   user-select: none;
 }

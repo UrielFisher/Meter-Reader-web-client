@@ -19,10 +19,11 @@ let json = {
 export const useMainStore = defineStore('main', {
   state: () => ({
     stores: {},
-    individuals: [{name:"ידז", pstn:"0504568712"}, {name:"עגד גשדשד", pstn:"0541135467"}, {name:"גדכגדשד", pstn:"0581234567"}],
+    individuals: ["ידז", "עגד גשדשד", "גדכגדשד"],
     eRate: null,
     wRate: null,
     gRate: null,
+    sRate: null,
     patternLength: 5,
     patternExtension: 1,  // for fractions, -----.-, each user sets manually
     currentPicture: null,  // not benefitial without history, but may be filled from 'camera' on route errors
@@ -36,8 +37,8 @@ export const useMainStore = defineStore('main', {
     // Initiates the stores for all saved individuals
     initStores() {
       for(let individual of this.individuals) {
-        if(!Object.keys(this.stores).includes(individual.name))
-          this.stores[individual.name] = makeIndividualStore(individual.name)()
+        if(!(individual in this.stores))
+          this.stores[individual] = makeIndividualStore(individual)()
       }
     },
 

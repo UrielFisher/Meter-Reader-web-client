@@ -21,7 +21,7 @@ export default{
 <template>
   <div class="parent">
     <div id="container">
-      <Indiv v-for="{name} of this.individuals" class="individual" :name="name" :key="name">
+      <Indiv v-for="name of individuals" class="individual" :name="name" :key="name">
       </Indiv>
     </div>
     <button id="settings" @click="$router.push('/settings')">⚙️</button>
