@@ -1,5 +1,5 @@
 <script>
-import { mapWritableState } from 'pinia';
+import { mapStores } from 'pinia';
 import { useMainStore } from '../stores/main.js'
 import SumMajor from './../components/sumMajor.vue'
 import * as htmlToImage from 'html-to-image'
@@ -12,12 +12,12 @@ export default {
     wasDownloaded: false
   }),
   computed: {
-    ...mapWritableState(useMainStore, ['stores', 'individuals']),
+    ...mapStores(useMainStore),
     name() {
       return this.$route.params.name
     },
-    data() {
-      return this.stores[this.name]
+    store() {
+      return this.mainStore.stores[this.name]
     },
     date() {
       // return new Date().toISOstring   .split("T")[0]
@@ -25,13 +25,13 @@ export default {
       return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`
     },
     gasTotal() {
-      return this.data.final.gas.amount * this.data.final.gas.rate
+      return this.store.final.gas.amount * this.store.final.gas.rate
     },
     sewerTotal() {
-      return (this.data.final.sewer.months?.length ?? 0) * this.data.final.sewer.rate
+      return (this.store.final.sewer.months?.length ?? 0) * this.store.final.sewer.rate
     },
     total() {
-      const f = this.data.final
+      const f = this.store.final
       return f.electricity.sum + f.water.sum + this.gasTotal + this.sewerTotal
     },
     sewerAmount() {
@@ -65,25 +65,30 @@ export default {
     async whatsapp() {
       if(!this.wasDownloaded)
         await this.download()
-      window.open("https://wa.me/" + this.stores[this.name].pstn)
+      window.open("https://wa.me/" + this.mainStore.stores[this.name].pstn)
+    },
+    loadDefaultRates() {
+      for(const type in this.store.final) {
+        this.store.final[type].rate = this.mainStore[type[0] + "Rate"]
+      }
     }
   },
   watch: {
     gasTotal: {
       handler() {
-        this.data.final.gas.sum = this.gasTotal
+        this.store.final.gas.sum = this.gasTotal
       },
       immediate: true
     },
     sewerTotal: {
       handler() {
-        this.data.final.sewer.sum = this.sewerTotal
+        this.store.final.sewer.sum = this.sewerTotal
       },
       immediate: true
     },
     total: {
       handler() {
-        this.data.total = this.total
+        this.store.total = this.total
       },
       immediate: true
     },
@@ -91,7 +96,8 @@ export default {
   created() {
     if(navigator?.canShare && navigator.canShare({text: ""}))
       this.canShare = true
-  }
+    this.loadDefaultRates()
+  },
 }
 </script>
 
@@ -104,27 +110,27 @@ export default {
       </div>
       <div id="content">
         <span id="parts">
-          <div id="electricity" v-if="data.final.electricity.reading">
+          <div id="electricity" v-if="store.final.electricity.reading">
             <h5 class="partTitle">חשמל</h5>
             <SumMajor class="partBody" type="electricity" />
           </div>
-          <div id="water" v-if="data.final.water.reading">
+          <div id="water" v-if="store.final.water.reading">
             <h5 class="partTitle">מים</h5>
             <SumMajor class="partBody" type="water" />
           </div>
-          <div class="part" id="gas" v-if="data.final.gas.amount !== '0'">
+          <div class="part" id="gas" v-if="store.final.gas.amount !== '0'">
             <h5 class="partTitle">גז</h5>
-            <p class="partBody subTotal">{{data.final.gas.amount * data.final.gas.rate}} = {{data.final.gas.rate}} • {{data.final.gas.amount}}</p>
+            <p class="partBody subTotal">{{store.final.gas.amount * store.final.gas.rate}} = {{store.final.gas.rate}} • {{store.final.gas.amount}}</p>
           </div>
-          <div class="part" id="sewer" v-if="data.final.sewer?.months">
+          <div class="part" id="sewer" v-if="store.final.sewer?.months">
             <h5 class="partTitle">ביוב</h5>
             <p class="partBody">{{ sewerAmount.join("/") }}</p>
-            <p class="partBody subTotal">{{sewerAmount.length * data.final.sewer.rate}} = {{data.final.sewer.rate}} • {{sewerAmount.length}}</p>
+            <p class="partBody subTotal">{{sewerAmount.length * store.final.sewer.rate}} = {{store.final.sewer.rate}} • {{sewerAmount.length}}</p>
           </div>
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="i in Object.values(data.final).filter((x) => x.sum !== 0)">{{ i.sum }}</p>
+            <p class="additive" v-for="i in Object.values(store.final).filter((x) => x.sum !== 0)">{{ i.sum }}</p>
             <p id="total">{{ total }}</p>
           </div>
         </span>

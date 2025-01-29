@@ -20,10 +20,10 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     stores: {},
     individuals: ["ידז", "עגד גשדשד", "גדכגדשד"],
-    eRate: null,
-    wRate: null,
-    gRate: null,
-    sRate: null,
+    eRate: 0,
+    wRate: 0,
+    gRate: 0,
+    sRate: 0,
     patternLength: 5,
     patternExtension: 1,  // for fractions, -----.-, each user sets manually
     currentPicture: null,  // not benefitial without history, but may be filled from 'camera' on route errors

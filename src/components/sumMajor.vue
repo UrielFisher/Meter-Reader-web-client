@@ -12,10 +12,10 @@ export default {
   },
   computed: {
     ...mapState(useMainStore, ['stores']),
-    data() {
+    store() {
       return this.stores[this.$route.params.name]
     },
-    t() { return this.data.final[this.type] },
+    t() { return this.store.final[this.type] },
     subtract() {
       return (this.t.reading - this.previous).toFixed(2)
     },
@@ -32,7 +32,7 @@ export default {
   watch: {
     sum: {
       handler() {
-        this.data.final[this.type].sum = parseFloat(this.sum)
+        this.store.final[this.type].sum = parseFloat(this.sum)
       },
       immediate: true
     }
@@ -50,7 +50,7 @@ export default {
     <p class="data line enil">{{ subtract }}</p>
     <label class="hint">
       לפי
-      <input type="number" v-model="t.rate" style="width: 50px; background-color: transparent">
+      <input type="number" v-model="store.final[type].rate" style="width: 50px; background-color: transparent">
     </label>
     <p v-if="this.type !== 'water'" class="data">{{ by }}</p>
     <p v-if="this.type !== 'water'" class="hint">17%+</p>
