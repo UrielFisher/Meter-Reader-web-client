@@ -1,8 +1,8 @@
 <script>
 import { markRaw } from 'vue';
 import { useMainStore } from './../stores/main.js';
-import { mapStores } from 'pinia';
 import { makeIndividualStore } from '@/stores/individual.js';
+import { mapStores } from 'pinia';
 
 export default{
   name: "Settings",
@@ -49,8 +49,8 @@ export default{
     ...mapStores(useMainStore),
   },
   watch: {
-    'this.value'() {
-      this[showEditor] = this.value
+    value() {
+      this[this.showEditor] = this.value
     }
   },
   methods: {
@@ -145,13 +145,13 @@ export default{
         }
       }
       this.showEditor = this.settings[index].variableName
-      this.value = this[this.settings[index].variableName]
+      this.value = this.mainStore[this.settings[index].variableName]
       this.$nextTick().then(() => {this.$refs.editor.focus()})
     },
 
     // Closes settings field editor
     closeEditor() {
-      this[this.showEditor] = this.value
+      this.mainStore[this.showEditor] = this.value
       this.showEditor = ''
     },
 
