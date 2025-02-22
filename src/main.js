@@ -39,6 +39,8 @@ const router = createRouter({
 
 const pinia = createPinia()
 
+window.serverAddress = "http://127.0.0.1:5000"
+
 createApp(App)
   .use(pinia)
   .use(router)

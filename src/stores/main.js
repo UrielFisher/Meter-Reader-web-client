@@ -50,12 +50,10 @@ export const useMainStore = defineStore('main', {
     async ocr(b64) {
       if(!b64) return
       json.requests[0].image.content = b64
-      return await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${import.meta.env.VITE_KEY}`,{
+      return await fetch(window.serverAddress + "/ocr", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(json)
+        headers: {"Content-Type": "application/json"},
+        body: b64
       })
       .then(data=> data.json())
       .then(data => data.responses[0])
