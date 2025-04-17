@@ -6,6 +6,7 @@ export default{
   name: "Camera",
   data() {
     return {
+      videoStream: undefined,
       height: 0,
       width: 320,
       streaming: false,
@@ -35,11 +36,12 @@ export default{
 
     navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
     .then((stream) => {
+      this.videoStream = stream
       this.video.srcObject = stream
       this.video.play()
     })
     .catch((error) => {
-      console.log("ERROR: "+ error);
+      console.error("healthy camera access or stream could not be obtained:\n" + error);
     })
 
     this.video.addEventListener(
@@ -64,6 +66,13 @@ export default{
       },
       false
     );
+  },
+  unmounted() {
+    if(this.videoStream?.getTracks) {
+      this.videoStream.getTracks()[0].stop()
+    } else {
+      // terminate stream when it's created
+    }
   },
   methods: {
     getElements() {
