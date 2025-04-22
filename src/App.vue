@@ -1,8 +1,11 @@
 <script>
+import { mapActions } from 'pinia';
+import { useMainStore } from './stores/main';
 
 export default{
   name: "App",
   methods: {
+    ...mapActions(useMainStore, ['initStores']),
     getImageAsBase64(imagePath) {
       fetch("http://localhost:5173/src/assets/img/google-ocr-sign.jpg")
         .then(response => response.blob())
@@ -21,6 +24,9 @@ export default{
           console.log("Error B64ing image: " + error)
         });
     },
+  },
+  created() {
+    this.initStores()
   },
 }
 </script>

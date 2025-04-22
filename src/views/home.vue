@@ -7,21 +7,18 @@ export default{
   name: "Home",
   components: {Indiv},
   computed: {
-    ...mapState(useMainStore, ['individuals', 'stores']),
+    ...mapState(useMainStore, ['stores']),
   },
   methods: {
     ...mapActions(useMainStore, ['initStores']),
   },
-  created() {
-    this.initStores()
-  }
 }
 </script>
 
 <template>
   <div class="parent">
     <div id="container">
-      <Indiv v-for="name of individuals" class="individual" :name="name" :key="name">
+      <Indiv v-for="{name} in stores" class="individual" :name="name" :key="name">
       </Indiv>
     </div>
     <button id="settings" @click="$router.push('/settings')">⚙️</button>

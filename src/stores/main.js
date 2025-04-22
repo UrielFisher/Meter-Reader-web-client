@@ -19,7 +19,6 @@ let json = {
 export const useMainStore = defineStore('main', {
   state: () => ({
     stores: {},
-    individuals: ["ידז", "עגד גשדשד", "גדכגדשד"],
     eRate: 0,
     wRate: 0,
     gRate: 0,
@@ -35,10 +34,15 @@ export const useMainStore = defineStore('main', {
   // },
   actions: {
     // Initiates the stores for all saved individuals
-    initStores() {
-      for(let individual of this.individuals) {
-        if(!(individual in this.stores))
-          this.stores[individual] = makeIndividualStore(individual)()
+    async initStores() {
+      const individuals = await fetch(`${window.serverAddress}/individuals/`).then(res => res.json())
+      for(let individual of individuals) {
+        if(!(individual.name in this.stores)) {
+          this.stores[individual.name] = makeIndividualStore(individual.name)()
+          for(let property in individual) {
+            this.stores[individual.name][property] = individual[property]
+          }
+        }
       }
     },
 

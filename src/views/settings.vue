@@ -76,11 +76,15 @@ export default{
 
     // Saves individual when it's added
      saveNewIndiv() {
-      this.mainStore.individuals.push(this.individualToAdd.name)
       this.mainStore.stores[this.individualToAdd.name] = makeIndividualStore(this.individualToAdd.name)()
       for(const property in this.individualToAdd) {
         this.mainStore.stores[this.individualToAdd.name][property] = this.individualToAdd[property]
       }
+      fetch(`${window.serverAddress}/individuals/`, {
+        headers: {'Content-Type': 'application/json'},
+        method: "POST",
+        body: JSON.stringify(this.individualToAdd)
+      })
       this.individualToAdd = undefined
     },
 
@@ -104,6 +108,12 @@ export default{
         indivStore[propertyName] = event.target.checked
       else
         indivStore[propertyName] = event.target.value
+
+      fetch(`${window.serverAddress}/individuals/${indivStore.name}`, {
+        headers: {'Content-Type': 'application/json'},
+        method: "PATCH",
+        body: JSON.stringify({[propertyName]: indivStore[propertyName]})
+      })
     },
 
     /**
@@ -127,12 +137,14 @@ export default{
      * @param {pinia Store} indivStore - individual's store to delete
      */
     deleteIndividual(indivStore) {
-      if(confirm(`Are you sure aboute deleting ${indivStore.name}?`)) {
-        const index = this.mainStore.individuals.indexOf(indivStore.name)
-        this.mainStore.individuals.splice(index, 1)
-        delete this.mainStore.stores[indivStore.name]
-        indivStore.$dispose()
-      }
+      if(!confirm(`Are you sure aboute deleting ${indivStore.name}?`)) return
+
+      delete this.mainStore.stores[indivStore.name]
+      indivStore.$dispose()
+
+      fetch(`${window.serverAddress}/individuals/${indivStore.name}`, {
+        method: "DELETE"
+      }).catch((e) => {alert("קרתה תקלה במחיקה")})
     },
 
     // Opens settings field editor
