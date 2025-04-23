@@ -43,7 +43,8 @@ export default {
     async getFile() {
       const paper = this.$refs.paper
       const blob = await htmlToImage.toBlob(paper)
-      return new File([blob], this.name + ".png", {type: blob.type})
+      const dateStr = this.date.split("/").slice(1,3).join(".")
+      return new File([blob], `${this.name}-${dateStr}.png`, {type: blob.type})
     },
     async shareImage() {
       const file = await this.getFile()
@@ -103,6 +104,7 @@ export default {
 
 <template>
   <div class="parent">
+    <button class="backButton" @click="$router.push('/')">></button>
     <div id="paper" ref="paper">
       <div id="header">
         <h3 id="name">אוריאל פישר</h3>
