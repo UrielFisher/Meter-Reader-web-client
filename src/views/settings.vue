@@ -75,16 +75,17 @@ export default{
     },
 
     // Saves individual when it's added
-     saveNewIndiv() {
+     async saveNewIndiv() {
       this.mainStore.stores[this.individualToAdd.name] = makeIndividualStore(this.individualToAdd.name)()
       for(const property in this.individualToAdd) {
         this.mainStore.stores[this.individualToAdd.name][property] = this.individualToAdd[property]
       }
-      fetch(`${window.serverAddress}/individuals/`, {
+      const indivId = fetch(`${window.serverAddress}/individuals/`, {
         headers: {'Content-Type': 'application/json'},
         method: "POST",
         body: JSON.stringify(this.individualToAdd)
       })
+      this.mainStore.stores[this.individualToAdd.name].indivId = Number(indivId)
       this.individualToAdd = undefined
     },
 

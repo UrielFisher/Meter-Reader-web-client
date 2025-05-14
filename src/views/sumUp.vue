@@ -24,16 +24,6 @@ export default {
       const d = new Date
       return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`
     },
-    gasTotal() {
-      return this.store.final.gas.amount * this.store.final.gas.rate
-    },
-    sewerTotal() {
-      return (this.store.final.sewer.months?.length ?? 0) * this.store.final.sewer.rate
-    },
-    total() {
-      const f = this.store.final
-      return f.electricity.sum + f.water.sum + this.gasTotal + this.sewerTotal
-    },
     sewerAmount() {
       // check for time in months since last bill
       return [2, 3, 4]
@@ -69,35 +59,20 @@ export default {
       window.open("https://wa.me/" + this.mainStore.stores[this.name].pstn)
     },
     loadDefaultRates() {
-      for(const type in this.store.final) {
-        this.store.final[type].rate = this.mainStore[type[0] + "Rate"]
+      for(const type in this.store.rates) {
+        this.store.rates[type] = this.mainStore[type[0] + "Rate"]
       }
     }
-  },
-  watch: {
-    gasTotal: {
-      handler() {
-        this.store.final.gas.sum = this.gasTotal
-      },
-      immediate: true
-    },
-    sewerTotal: {
-      handler() {
-        this.store.final.sewer.sum = this.sewerTotal
-      },
-      immediate: true
-    },
-    total: {
-      handler() {
-        this.store.total = this.total
-      },
-      immediate: true
-    },
   },
   created() {
     if(navigator?.canShare && navigator.canShare({text: ""}))
       this.canShare = true
     this.loadDefaultRates()
+    fetch(window.serverAddress + '/records/', {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify((({indivId, total, rates, readings}) => ({indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
+    })
   },
 }
 </script>
@@ -107,42 +82,42 @@ export default {
     <button class="backButton" @click="$router.push('/')">></button>
     <div id="paper" ref="paper">
       <div id="header">
-        <h3 id="name">אוריאל פישר</h3>
+        <h3 id="name">{{ store.name }}</h3>
         <input id="date" placeholder="תאריך:" :value="date"></input>
       </div>
       <div id="content">
         <span id="parts">
-          <div id="electricity" v-if="store.final.electricity.reading">
+          <div id="electricity" v-if="store.readings.electricity">
             <h5 class="partTitle">חשמל</h5>
             <SumMajor class="partBody" type="electricity" />
           </div>
-          <div id="water" v-if="store.final.water.reading">
+          <div id="water" v-if="store.readings.water">
             <h5 class="partTitle">מים</h5>
             <SumMajor class="partBody" type="water" />
           </div>
-          <div class="part" id="gas" v-if="store.final.gas.amount !== '0'">
+          <div class="part" id="gas" v-if="store.readings.gas">
             <h5 class="partTitle">גז</h5>
-            <p class="partBody subTotal">{{store.final.gas.amount * store.final.gas.rate}} = {{store.final.gas.rate}} • {{store.final.gas.amount}}</p>
+            <p class="partBody subTotal">{{store.readings.gas * store.rates.gas}} = {{store.rates.gas}} • {{store.readings.gas}}</p>
           </div>
-          <div class="part" id="sewer" v-if="store.final.sewer?.months">
+          <div class="part" id="sewer" v-if="store.readings.sewer">
             <h5 class="partTitle">ביוב</h5>
             <p class="partBody">{{ sewerAmount.join("/") }}</p>
-            <p class="partBody subTotal">{{sewerAmount.length * store.final.sewer.rate}} = {{store.final.sewer.rate}} • {{sewerAmount.length}}</p>
+            <p class="partBody subTotal">{{sewerAmount.length * store.rates.sewer}} = {{store.rates.sewer}} • {{sewerAmount.length}}</p>
           </div>
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="i in Object.values(store.final).filter((x) => x.sum !== 0)">{{ i.sum }}</p>
-            <p id="total">{{ total }}</p>
+            <p class="additive" v-for="v, k in Object.fromEntries(Object.entries(store.readings).filter(x => x[1]))">{{ (v * store.rates[k]).toFixed(2) }}</p>
+            <p id="total">{{ store.total }}</p>
           </div>
         </span>
       </div>
     </div>
-    <footer id="shareBar">
+    <!-- <footer id="shareBar">
       <button class="shareBtn" @click="download"></button>
       <button class="shareBtn" @click="shareImage" v-if="canShare">Share</button>
       <button class="shareBtn" @click="whatsapp"></button>
-    </footer>
+    </footer> -->
   </div>
 </template>
 

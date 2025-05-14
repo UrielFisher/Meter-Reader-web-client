@@ -21,7 +21,7 @@ export default{
     <h3 style="text-decoration: underline">{{ name }}</h3>
   </div>
   <div v-else-if="type === 'gas'" class="field-box">
-    <select v-model="data.final[type].amount">
+    <select v-model="data.readings[type]">
       <option value="0">0</option>
       <option value="1">1</option>
       <option value="2">2</option>
@@ -31,7 +31,7 @@ export default{
   <div v-else class="field-box">
     <div class="field">
       <button class="symbol" @click="$router.push(`/camera/${type[0]}/${name}`)"></button>
-      <input v-model="data.final[type].reading" type="number" class="numbers" min="0" max="999999">
+      <input v-model="data.readings[type]" type="number" class="numbers" min="0" max="999999">
     </div>
   </div>
 </template>
