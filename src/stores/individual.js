@@ -44,6 +44,21 @@ export const makeIndividualStore = (name) => {
         }
         return sum.toFixed(2)
       }
+    },
+    actions: {
+    // fills the previousReadings object of the individual with the last record from the server
+    getPreviousReadings() {
+      fetch(`${window.serverAddress}/records/${this.indivId}/lastRecord`)
+      .then(res => res.json())
+      .then(res => res.readings)
+      .then(res => JSON.parse(res))
+      .then((res) => {
+        for(let type in res) {
+           if(type in this.previousReadings)
+            this.previousReadings[type] = res[type]
+          }
+      })
+    }
     }
   })
   
