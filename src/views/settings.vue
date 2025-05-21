@@ -213,8 +213,8 @@ export default{
             <button @click="deleteIndividual(indivStore)" class="delete-btn">🗑️</button>
           </td>
           <td v-for="propertyValue, property in editableFields">
-            <input @change="editIndividual(indivStore, property, $event)" :checked="indivStore[property]"
-            class="table-input" v-if="typeof(indivStore[property])==='boolean'"         type="checkbox"/>
+            <input @change="editIndividual(indivStore, property, $event)" :checked="indivStore[property]" type="checkbox"
+            class="table-input" v-if="typeof(indivStore[property])==='boolean' || [0, 1].includes(indivStore[property])"/>
             <input @change="editIndividual(indivStore, property, $event)" :value="indivStore[property]"
             class="table-input" v-else/>
           </td>
