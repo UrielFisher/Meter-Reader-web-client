@@ -7,6 +7,7 @@ export const makeIndividualStore = (name) => {
       name: name,
       pstn: undefined,
       paysForSewer: false,
+      lastRecordTime: undefined,
 
       eImg: {img: null,value: null},
       wImg: {img: null,value: null},
@@ -48,9 +49,12 @@ export const makeIndividualStore = (name) => {
     actions: {
     // fills the previousReadings object of the individual with the last record from the server
     getPreviousReadings() {
-      fetch(`${window.serverAddress}/records/${this.indivId}/lastRecord`)
+      fetch(`${window.serverAddress}/records/${this.indivId}/indexFromRecent/0`)
       .then(res => res.json())
-      .then(res => res.readings)
+      .then(res => {
+        this.lastRecordTime = res.date
+        return res.readings
+      })
       .then(res => JSON.parse(res))
       .then((res) => {
         for(let type in res) {

@@ -9,7 +9,10 @@ export default {
   components: {SumMajor},
   data: () => ({
     canShare: false,
-    wasDownloaded: false
+    wasDownloaded: false,
+    wasSaved: false,
+    trueNewFalseEdit: true,
+    currentlySubmitting: false
   }),
   computed: {
     ...mapStores(useMainStore),
@@ -37,11 +40,13 @@ export default {
       return new File([blob], `${this.name}-${dateStr}.png`, {type: blob.type})
     },
     async shareImage() {
+      this.saveRecordToDB()
       const file = await this.getFile()
       if(navigator.canShare({files: [file]}))
         navigator.share({files: [file]})
     },
     async download() {
+      this.saveRecordToDB()
       const file = await this.getFile()
       const link = window.URL.createObjectURL(file)
       let a = document.createElement("a")
@@ -59,21 +64,54 @@ export default {
       window.open("https://wa.me/" + this.mainStore.stores[this.name].pstn)
     },
     loadDefaultRates() {
-      for(const type in this.store.rates) {
+      for(const type in this.store?.rates) {
         this.store.rates[type] = this.mainStore[type[0] + "Rate"]
       }
+    },
+    saveRecordToDB() {
+      // check for no ongoing requests
+      if(this.currentlySubmitting || this.wasSaved) return
+      this.currentlySubmitting = true
+
+      // edit instead of create if last record was made less than a month ago
+      this.trueNewFalseEdit = ((Date.now() / 1000) - this.store.lastRecordTime) > 60*60*24*27
+
+      // submit record
+      const method = this.trueNewFalseEdit ? "POST" : "PUT"
+      console.log("Saving record. new or edit: " + (this.trueNewFalseEdit ? "New" : "Edit"))
+      try {
+        fetch(window.serverAddress + '/records/', {
+          method,
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify((({indivId, total, rates, readings}) => ({indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
+        })
+        .then(() => {
+          this.store.lastRecordTime = Math.round(Date.now() / 1000)
+          this.wasSaved = true
+        })
+      } catch(error) {
+        console.error(`Error logging record for ${this.name}`, error)
+      }
+      this.currentlySubmitting = false
     }
   },
   created() {
     if(navigator?.canShare && navigator.canShare({text: ""}))
       this.canShare = true
-    this.loadDefaultRates()
-    fetch(window.serverAddress + '/records/', {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify((({indivId, total, rates, readings}) => ({indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
+
+    this.$nextTick(() => {
+      this.loadDefaultRates()
     })
   },
+  watch: {
+    store: {
+      handler() {
+        this.wasSaved = false
+        this.wasDownloaded = false
+      },
+      deep: true
+    }
+  }
 }
 </script>
 
@@ -82,42 +120,42 @@ export default {
     <button class="backButton" @click="$router.push('/')">></button>
     <div id="paper" ref="paper">
       <div id="header">
-        <h3 id="name">{{ store.name }}</h3>
+        <h3 id="name">{{ name }}</h3>
         <input id="date" placeholder="תאריך:" :value="date"></input>
       </div>
       <div id="content">
         <span id="parts">
-          <div id="electricity" v-if="store.readings.electricity">
+          <div id="electricity" v-if="store?.readings.electricity">
             <h5 class="partTitle">חשמל</h5>
             <SumMajor class="partBody" type="electricity" />
           </div>
-          <div id="water" v-if="store.readings.water">
+          <div id="water" v-if="store?.readings.water">
             <h5 class="partTitle">מים</h5>
             <SumMajor class="partBody" type="water" />
           </div>
-          <div class="part" id="gas" v-if="store.readings.gas">
+          <div class="part" id="gas" v-if="store?.readings.gas">
             <h5 class="partTitle">גז</h5>
-            <p class="partBody subTotal">{{store.readings.gas * store.rates.gas}} = {{store.rates.gas}} • {{store.readings.gas}}</p>
+            <p class="partBody subTotal">{{store?.readings.gas * store?.rates.gas}} = {{store?.rates.gas}} • {{store?.readings.gas}}</p>
           </div>
-          <div class="part" id="sewer" v-if="store.readings.sewer">
+          <div class="part" id="sewer" v-if="store?.readings.sewer">
             <h5 class="partTitle">ביוב</h5>
             <p class="partBody">{{ sewerAmount.join("/") }}</p>
-            <p class="partBody subTotal">{{sewerAmount.length * store.rates.sewer}} = {{store.rates.sewer}} • {{sewerAmount.length}}</p>
+            <p class="partBody subTotal">{{sewerAmount.length * store?.rates.sewer}} = {{store?.rates.sewer}} • {{sewerAmount.length}}</p>
           </div>
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="v, k in Object.fromEntries(Object.entries(store.readings).filter(x => x[1]))">{{ (v * store.rates[k]).toFixed(2) }}</p>
-            <p id="total">{{ store.total }}</p>
+            <p class="additive" v-for="v, k in Object.fromEntries(Object.entries(store?.readings ?? {}).filter(x => x[1]))">{{ (v * store?.rates[k]).toFixed(2) }}</p>
+            <p id="total">{{ store?.total }}</p>
           </div>
         </span>
       </div>
     </div>
-    <!-- <footer id="shareBar">
+    <footer id="shareBar">
       <button class="shareBtn" @click="download"></button>
       <button class="shareBtn" @click="shareImage" v-if="canShare">Share</button>
       <button class="shareBtn" @click="whatsapp"></button>
-    </footer> -->
+    </footer>
   </div>
 </template>
 
