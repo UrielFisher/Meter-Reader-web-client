@@ -43,7 +43,7 @@ export const useMainStore = defineStore('main', {
             this.stores[individual.name][property] = individual[property]
           }
         }
-        this.stores[individual.name].getPreviousReadings()
+        this.stores[individual.name].getLatestReadings()
       }
     },
 

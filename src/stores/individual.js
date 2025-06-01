@@ -47,22 +47,37 @@ export const makeIndividualStore = (name) => {
       }
     },
     actions: {
-    // fills the previousReadings object of the individual with the last record from the server
-    getPreviousReadings() {
-      fetch(`${window.serverAddress}/records/${this.indivId}/indexFromRecent/0`)
-      .then(res => res.json())
-      .then(res => {
-        this.lastRecordTime = res.date
-        return res.readings
-      })
-      .then(res => JSON.parse(res))
-      .then((res) => {
-        for(let type in res) {
-           if(type in this.previousReadings)
-            this.previousReadings[type] = res[type]
+      // fills readings data of the individual with record data from the server
+      // if elapsed time since last record is greater than threshold, load into previousReadings
+      // if shorter, load into readings and load the record before into previousReadings
+      async getLatestReadings() {
+        function distributeReadings(readings, dest){
+          for(let type in readings) {
+            if(type in dest)
+            dest[type] = readings[type]
           }
-      })
-    }
+        }
+        const recentRecord = await this.fetchRecentRecord(0)
+        const isLong = ((Date.now() / 1000) - recentRecord.recordTime) > 60*60*24*27
+
+        const dest = isLong ? this.previousReadings : this.readings
+        distributeReadings(recentRecord.readings, dest)
+        if (!isLong) {
+          const secRecentRecord = await this.fetchRecentRecord(1)
+          distributeReadings(secRecentRecord.readings, this.previousReadings)
+        }
+      },
+      async fetchRecentRecord(index=0) {
+        let recordTime
+        const readings = await fetch(`${window.serverAddress}/records/${this.indivId}/indexFromRecent/${index}`)
+        .then(res => res.json())
+        .then(res => {
+          recordTime = res.date
+          return res.readings
+        })
+        .then(res => JSON.parse(res))
+        return {readings, recordTime}
+      }
     }
   })
   
