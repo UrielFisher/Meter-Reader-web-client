@@ -33,6 +33,12 @@ export const useMainStore = defineStore('main', {
   //   }
   // },
   actions: {
+    // initiates store-tied data and data structures
+    initiate() {
+      this.initStores()
+      this.fetchSettings()
+    },
+
     // Initiates the stores for all saved individuals
     async initStores() {
       const individuals = await fetch(`${window.serverAddress}/individuals/`).then(res => res.json())
@@ -44,6 +50,14 @@ export const useMainStore = defineStore('main', {
           }
         }
         this.stores[individual.name].getLatestReadings()
+      }
+    },
+
+    // fetches user settings from the server
+    async fetchSettings() {
+      const settings = await fetch(`${window.serverAddress}/users/settings`).then(res => res.json())
+      for(let setting in settings) {
+        this[setting] = settings[setting]
       }
     },
 

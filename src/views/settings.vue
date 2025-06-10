@@ -39,6 +39,7 @@ export default{
           text: "אורך שבר במונה (מספר אדום):‏"
         }
       ]),
+      changesMade: false,
       showEditor: '',
       value: '',
       individualToAdd: undefined,
@@ -164,6 +165,8 @@ export default{
 
     // Closes settings field editor
     closeEditor() {
+      if(this.mainStore[this.showEditor] === this.value) this.changesMade = true
+
       this.mainStore[this.showEditor] = this.value
       this.showEditor = ''
     },
@@ -189,8 +192,23 @@ export default{
         }
       }
     },
+
+    // sends all settings from main store to server for saving
+    saveChanges() {
+      const settingsToSave = {}
+      for(let {variableName} of this.settings) {
+        settingsToSave[variableName] = this.mainStore[variableName]
+      }
+      fetch(`${window.serverAddress}/users/settings`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(settingsToSave)
+      })
+    }
   },
   unmounted() {
+    if(this.changesMade) this.saveChanges()
+
     this.modifyStoresNames()
   },
 }

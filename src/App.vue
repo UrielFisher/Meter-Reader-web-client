@@ -5,7 +5,7 @@ import { useMainStore } from './stores/main';
 export default{
   name: "App",
   methods: {
-    ...mapActions(useMainStore, ['initStores']),
+    ...mapActions(useMainStore, ['initiate']),
     getImageAsBase64(imagePath) {
       fetch("http://localhost:5173/src/assets/img/google-ocr-sign.jpg")
         .then(response => response.blob())
@@ -26,7 +26,7 @@ export default{
     },
   },
   created() {
-    this.initStores()
+    this.initiate()
   },
 }
 </script>
