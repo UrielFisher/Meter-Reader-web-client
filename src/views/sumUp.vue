@@ -8,6 +8,7 @@ export default {
   name: "SumUp",
   components: {SumMajor},
   data: () => ({
+    date: undefined,
     canShare: false,
     wasDownloaded: false,
     wasSaved: false,
@@ -21,11 +22,6 @@ export default {
     },
     store() {
       return this.mainStore.stores[this.name]
-    },
-    date() {
-      // return new Date().toISOstring   .split("T")[0]
-      const d = new Date
-      return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`
     },
     sewerAmount() {
       // check for time in months since last bill
@@ -83,7 +79,7 @@ export default {
         fetch(window.serverAddress + '/records/', {
           method,
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify((({indivId, total, rates, readings}) => ({indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
+          body: JSON.stringify((({indivId, total, rates, readings}) => ({date: this.time/1000, indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
         })
         .then(() => {
           this.store.lastRecordTime = Math.round(Date.now() / 1000)
@@ -93,7 +89,17 @@ export default {
         console.error(`Error logging record for ${this.name}`, error)
       }
       this.currentlySubmitting = false
-    }
+    },
+    fillDate() {
+      if(this.store?.lastRecordTime) {
+        const d = new Date(this.store.lastRecordTime)
+        this.date = `${d.getFullYear()}-${('0' + (d.getMonth()+1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`
+      }
+      else {
+        const d = new Date()
+        this.date = `${d.getFullYear()}-${('0' + (d.getMonth()+1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`
+      }
+    },
   },
   created() {
     if(navigator?.canShare && navigator.canShare({text: ""}))
@@ -102,6 +108,8 @@ export default {
     this.$nextTick(() => {
       this.loadDefaultRates()
     })
+
+    this.fillDate()
   },
   watch: {
     store: {
@@ -110,7 +118,12 @@ export default {
         this.wasDownloaded = false
       },
       deep: true
-    }
+    },
+    'store.lastRecordTime': {
+      handler() {
+        this.fillDate()
+      }
+    },
   }
 }
 </script>
@@ -121,7 +134,7 @@ export default {
     <div id="paper" ref="paper">
       <div id="header">
         <h3 id="name">{{ name }}</h3>
-        <input id="date" placeholder="תאריך:" :value="date"></input>
+        <input id="date" type="date" placeholder="תאריך:" v-model="date"></input>
       </div>
       <div id="content">
         <span id="parts">
