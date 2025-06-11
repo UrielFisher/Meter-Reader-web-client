@@ -30,9 +30,9 @@ export default {
 <template>
   <div class="part">
     <p class="hint">ק. נוכחית</p>
-    <p class="data">{{ store.readings[type].toFixed(2) }}</p>
+    <input type="number" class="data" v-model="store.readings[type]" />
     <p class="hint">ק. קודמת</p>
-    <p class="data">{{ store.previousReadings[type]?.toFixed(2) }}</p>
+    <input type="number" class="data" v-model="store.previousReadings[type]" />
     <p class="data line enil">{{ readingMargin }}</p>
     <label class="hint">
       לפי
