@@ -70,7 +70,7 @@ export default {
       this.currentlySubmitting = true
 
       // edit instead of create if last record was made less than a month ago
-      this.trueNewFalseEdit = ((Date.now() / 1000) - this.store.lastRecordTime) > 60*60*24*27
+      this.trueNewFalseEdit = this.store?.lastRecordTime ? (((Date.now() / 1000) - this.store.lastRecordTime) > 60*60*24*27) : true
 
       // submit record
       const method = this.trueNewFalseEdit ? "POST" : "PUT"
