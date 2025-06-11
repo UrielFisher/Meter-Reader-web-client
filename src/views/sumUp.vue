@@ -102,6 +102,8 @@ export default {
     },
   },
   created() {
+    this.saveRecordToDB()
+
     if(navigator?.canShare && navigator.canShare({text: ""}))
       this.canShare = true
 
@@ -124,7 +126,10 @@ export default {
         this.fillDate()
       }
     },
-  }
+  },
+  unmounted() {
+    this.saveRecordToDB()
+  },
 }
 </script>
 
