@@ -79,7 +79,7 @@ export default {
         fetch(window.serverAddress + '/records/', {
           method,
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify((({indivId, total, rates, readings}) => ({date: this.time/1000, indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
+          body: JSON.stringify((({indivId, total, rates, readings}) => ({date: new Date(this.date).getTime(), indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
         })
         .then(() => {
           this.store.lastRecordTime = Math.round(Date.now() / 1000)
