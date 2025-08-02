@@ -12,7 +12,6 @@ export default {
     canShare: false,
     wasDownloaded: false,
     wasSaved: false,
-    trueNewFalseEdit: true,
     currentlySubmitting: false
   }),
   computed: {
@@ -40,6 +39,7 @@ export default {
       const file = await this.getFile()
       if(navigator.canShare({files: [file]}))
         navigator.share({files: [file]})
+      this.store.$reset()
     },
     async download() {
       this.saveRecordToDB()
@@ -53,6 +53,7 @@ export default {
       a.remove()
       window.URL.revokeObjectURL(link)
       this.wasDownloaded = true
+      this.store.$reset()
     },
     async whatsapp() {
       if(!this.wasDownloaded)
@@ -69,20 +70,13 @@ export default {
       if(this.currentlySubmitting || this.wasSaved) return
       this.currentlySubmitting = true
 
-      // edit instead of create if last record was made less than a month ago
-      this.trueNewFalseEdit = this.store?.lastRecordTime ? (((Date.now() / 1000) - this.store.lastRecordTime) > 60*60*24*27) : true
-
-      // submit record
-      const method = this.trueNewFalseEdit ? "POST" : "PUT"
-      console.log("Saving record. new or edit: " + (this.trueNewFalseEdit ? "New" : "Edit"))
       try {
         fetch(window.serverAddress + '/records/', {
-          method,
+          method: "POST",
           headers: {"Content-Type": "application/json"},
-          body: JSON.stringify((({indivId, total, rates, readings}) => ({date: new Date(this.date).getTime(), indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.mainStore.stores[this.name]))
+          body: JSON.stringify((({indivId, total, rates, readings}) => ({date: new Date(this.date).getTime()/1000, indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.store))
         })
         .then(() => {
-          this.store.lastRecordTime = Math.round(Date.now() / 1000)
           this.wasSaved = true
         })
       } catch(error) {
@@ -91,19 +85,11 @@ export default {
       this.currentlySubmitting = false
     },
     fillDate() {
-      if(this.store?.lastRecordTime) {
-        const d = new Date(this.store.lastRecordTime)
-        this.date = `${d.getFullYear()}-${('0' + (d.getMonth()+1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`
-      }
-      else {
-        const d = new Date()
-        this.date = `${d.getFullYear()}-${('0' + (d.getMonth()+1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`
-      }
+      const d = new Date()
+      this.date = `${d.getFullYear()}-${('0' + (d.getMonth()+1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`
     },
   },
   created() {
-    this.saveRecordToDB()
-
     if(navigator?.canShare && navigator.canShare({text: ""}))
       this.canShare = true
 
@@ -121,14 +107,6 @@ export default {
       },
       deep: true
     },
-    'store.lastRecordTime': {
-      handler() {
-        this.fillDate()
-      }
-    },
-  },
-  unmounted() {
-    this.saveRecordToDB()
   },
 }
 </script>
@@ -136,6 +114,7 @@ export default {
 <template>
   <div class="parent">
     <button class="backButton" @click="$router.push('/')">></button>
+    <button class="saveButton" @click="saveRecordToDB()" :style="'background-color:' + (wasSaved ? 'green' : 'blue')">s</button>
     <div id="paper" ref="paper">
       <div id="header">
         <h3 id="name">{{ name }}</h3>
@@ -276,6 +255,16 @@ export default {
 
 .shareBtn:first-child {
   background-image: url("./../assets/img/download.svg");
+}
+
+.saveButton {
+  float: right;
+  font-size: 18px;
+  height: 30px;
+  width: 30px;
+  margin: 10px;
+  border: 2px solid black;
+  border-radius: 50%;
 }
 </style>
 

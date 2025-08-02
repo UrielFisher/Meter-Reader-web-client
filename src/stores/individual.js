@@ -7,7 +7,6 @@ export const makeIndividualStore = (name) => {
       name: name,
       pstn: undefined,
       paysForSewer: false,
-      lastRecordTime: undefined,
 
       eImg: {img: null,value: null},
       wImg: {img: null,value: null},
@@ -51,32 +50,25 @@ export const makeIndividualStore = (name) => {
       // if elapsed time since last record is greater than threshold, load into previousReadings
       // if shorter, load into readings and load the record before into previousReadings
       async getLatestReadings() {
-        function distributeReadings(readings, dest){
-          for(let type in readings) {
-            if(type in dest)
-            dest[type] = readings[type]
-          }
-        }
-        const recentRecord = await this.fetchRecentRecord(0)
-        const isLong = ((Date.now() / 1000) - recentRecord.recordTime) > 60*60*24*27
-
-        const dest = isLong ? this.previousReadings : this.readings
-        distributeReadings(recentRecord.readings, dest)
-        if (!isLong) {
-          const secRecentRecord = await this.fetchRecentRecord(1)
-          distributeReadings(secRecentRecord.readings, this.previousReadings)
+        const {readings} = await this.fetchRecentRecord()
+        for(let type in readings) {
+          if(type in this.previousReadings)
+            this.previousReadings[type] = readings[type]
         }
       },
-      async fetchRecentRecord(index=0) {
-        let recordTime
-        const readings = await fetch(`${window.serverAddress}/records/${this.indivId}/indexFromRecent/${index}`)
+      async fetchRecentRecord() {
+        return await fetch(`${window.serverAddress}/records/${this.indivId}/indexFromRecent/0`)
         .then(res => res.json())
         .then(res => {
-          recordTime = res.date
-          return res.readings
+          for(let fieldName in res) {
+            if(typeof(res[fieldName]) === 'string') {
+              try {
+                res[fieldName] = JSON.parse(res[fieldName])
+              } catch(e) {}
+            }
+          }
+          return res
         })
-        .then(res => JSON.parse(res))
-        return {readings, recordTime}
       }
     }
   })
