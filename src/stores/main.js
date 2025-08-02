@@ -49,7 +49,7 @@ export const useMainStore = defineStore('main', {
             this.stores[individual.name][property] = individual[property]
           }
         }
-        this.stores[individual.name].getLatestReadings()
+        this.stores[individual.name].fetchRecordHistory()
       }
     },
 

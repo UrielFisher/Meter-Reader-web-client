@@ -8,6 +8,8 @@ export const makeIndividualStore = (name) => {
       pstn: undefined,
       paysForSewer: false,
 
+      history: undefined,
+
       eImg: {img: null,value: null},
       wImg: {img: null,value: null},
       rates: {
@@ -46,29 +48,32 @@ export const makeIndividualStore = (name) => {
       }
     },
     actions: {
-      // fills readings data of the individual with record data from the server
-      // if elapsed time since last record is greater than threshold, load into previousReadings
-      // if shorter, load into readings and load the record before into previousReadings
-      async getLatestReadings() {
-        const {readings} = await this.fetchRecentRecord()
+      // fills previousReadings from record history
+      async fillPreviousReadings() {
+        const {readings} = this.history[0]
         for(let type in readings) {
           if(type in this.previousReadings)
             this.previousReadings[type] = readings[type]
         }
       },
-      async fetchRecentRecord() {
-        return await fetch(`${window.serverAddress}/records/${this.indivId}/indexFromRecent/0`)
+
+      // fetches record history, rehydrates JSON fields, triggers filling of previousReadings
+      async fetchRecordHistory() {
+        this.history = await fetch(`${window.serverAddress}/records/${this.indivId}/history`)
         .then(res => res.json())
         .then(res => {
-          for(let fieldName in res) {
-            if(typeof(res[fieldName]) === 'string') {
-              try {
-                res[fieldName] = JSON.parse(res[fieldName])
-              } catch(e) {}
+          for(const record of res) {
+            for(const fieldName in record) {
+              if(typeof(record[fieldName]) === 'string') {
+                try {
+                  record[fieldName] = JSON.parse(record[fieldName])
+                } catch(e) {}
+              }
             }
           }
           return res
         })
+        this.fillPreviousReadings()
       }
     }
   })
