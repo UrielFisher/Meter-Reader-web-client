@@ -8,7 +8,6 @@ export default {
   name: "SumUp",
   components: {SumMajor},
   data: () => ({
-    date: undefined,
     canShare: false,
     wasDownloaded: false,
     wasSaved: false,
@@ -21,6 +20,9 @@ export default {
     },
     store() {
       return this.mainStore.stores[this.name]
+    },
+    date() {
+      return new Date(this.store.history[this.store.historyIndex].date*1000).toISOString().split('T')[0]
     },
     sewerAmount() {
       // check for time in months since last bill
@@ -84,23 +86,18 @@ export default {
       }
       this.currentlySubmitting = false
     },
-    fillDate() {
-      const d = new Date()
-      this.date = `${d.getFullYear()}-${('0' + (d.getMonth()+1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`
-    },
   },
   created() {
     if(navigator?.canShare && navigator.canShare({text: ""}))
       this.canShare = true
 
     this.$nextTick(() => {
-      this.loadDefaultRates()
+      if(this.store.historyIndex === 0)
+        this.loadDefaultRates()
     })
-
-    this.fillDate()
   },
   watch: {
-    store: {
+    'store.history[store.historyIndex]': {
       handler() {
         this.wasSaved = false
         this.wasDownloaded = false

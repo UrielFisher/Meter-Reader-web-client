@@ -8,38 +8,62 @@ export const makeIndividualStore = (name) => {
       pstn: undefined,
       paysForSewer: false,
 
-      history: undefined,
+      historyIndex: 0,
+
+      history: [{
+        date: new Date(new Date().toISOString().split('T')[0]).getTime()/1000,
+        readings: {
+          electricity: null,
+          water: null,
+          gas: null,
+          sewer: null,
+        },
+        rates: {
+          electricity: null,
+          water: null,
+          gas: null,
+          sewer: null,
+        },
+      },{
+        date: undefined,
+        readings: {
+          electricity: null,
+          water: null,
+          gas: null,
+          sewer: null,
+        },
+        rates: {
+          electricity: null,
+          water: null,
+          gas: null,
+          sewer: null,
+        },
+      },],
 
       eImg: {img: null,value: null},
       wImg: {img: null,value: null},
-      rates: {
-        electricity: null,
-        water: null,
-        gas: null,
-        sewer: null,
-      },
-      previousReadings: {
-        electricity: null,
-        water: null,
-      },
-      readings: {
-        electricity: null,
-        water: null,
-        gas: null,
-        sewer: null,
-      },
-      // reset and fetch
     }),
     getters: {
+      date: (state) => {
+        return state.history[state.historyIndex].date
+      },
+      rates: (state) => {
+        return state.history[state.historyIndex].rates
+      },
+      readings: (state) => {
+        return state.history[state.historyIndex].readings
+      },
+      previousReadings: (state) => {
+        return state.history[state.historyIndex+1]?.readings ?? {}
+      },
       total: (state) => {
         let sum = 0
         for(let type in state.readings) {
           let amount
           try {
-            amount = state.readings[type] - (state.previousReadings[type] ?? 0)
+            amount = (state.readings[type] ?? 0) - (state.previousReadings[type] ?? 0)
           } catch(e) {
             amount =  state.readings[type]
-            console.error(`Previous readings of ${type} for ${state.name} are not Numbers like required`)
           }
 
           sum += amount * state.rates[type] ?? 0
@@ -48,18 +72,9 @@ export const makeIndividualStore = (name) => {
       }
     },
     actions: {
-      // fills previousReadings from record history
-      async fillPreviousReadings() {
-        const {readings} = this.history[0]
-        for(let type in readings) {
-          if(type in this.previousReadings)
-            this.previousReadings[type] = readings[type]
-        }
-      },
-
       // fetches record history, rehydrates JSON fields, triggers filling of previousReadings
       async fetchRecordHistory() {
-        this.history = await fetch(`${window.serverAddress}/records/${this.indivId}/history`)
+        const historyList = await fetch(`${window.serverAddress}/records/${this.indivId}/history`)
         .then(res => res.json())
         .then(res => {
           for(const record of res) {
@@ -73,7 +88,8 @@ export const makeIndividualStore = (name) => {
           }
           return res
         })
-        this.fillPreviousReadings()
+        this.history.pop()
+        this.history.push(...historyList)
       }
     }
   })
