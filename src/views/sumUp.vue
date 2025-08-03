@@ -111,7 +111,11 @@ export default {
 <template>
   <div class="parent">
     <button class="backButton" @click="$router.push('/')">></button>
-    <button class="saveButton" @click="saveRecordToDB()" :style="'background-color:' + (wasSaved ? 'green' : 'blue')">s</button>
+    <div class="historyNavigation">
+      <button @click="store.historyIndex--" :disabled="!(store.historyIndex > 0)"                     ><</button>
+      <button @click="saveRecordToDB()" class="saveButton" :class="{'justSaved' : wasSaved}" :style="'background-color:' + (store.historyIndex===0 ? 'lightblue' : 'orange')">s</button>
+      <button @click="store.historyIndex++" :disabled="!(store.historyIndex < store.history.length-1)">></button>
+    </div>
     <div id="paper" ref="paper">
       <div id="header">
         <h3 id="name">{{ name }}</h3>
@@ -261,7 +265,43 @@ export default {
   width: 30px;
   margin: 10px;
   border: 2px solid black;
-  border-radius: 50%;
+  outline: 0px solid green;
+  border-radius: 20%;
+}
+
+.justSaved {
+  animation: outline-saved 500ms ease-out;
+  outline-width: 3px;
+  outline-offset: -1px;
+  border: none;
+}
+
+.historyNavigation {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+
+@keyframes outline-saved {
+  0% {
+    outline-width: 0px;
+    outline-offset: -15px;
+    
+  }
+  30% {
+    outline-width: 10px;
+    outline-offset: -15px;
+    border: 2px solid black;
+  }
+  100% {
+    outline-width: 3px;
+    outline-offset: -1px;
+    border: none
+  }
 }
 </style>
 
