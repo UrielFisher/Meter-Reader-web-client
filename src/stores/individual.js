@@ -44,6 +44,9 @@ export const makeIndividualStore = (name) => {
       wImg: {img: null,value: null},
     }),
     getters: {
+      recordId: (state) => {
+        return state.historyIndex ? state.history[state.historyIndex].recordId : undefined
+      },
       date: (state) => {
         return state.history[state.historyIndex].date
       },

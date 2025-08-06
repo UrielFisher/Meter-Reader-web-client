@@ -67,24 +67,34 @@ export default {
         this.store.rates[type] = this.mainStore[type[0] + "Rate"]
       }
     },
-    saveRecordToDB() {
+    async saveRecordToDB() {
       // check for no ongoing requests
       if(this.currentlySubmitting || this.wasSaved) return
       this.currentlySubmitting = true
 
       try {
-        fetch(window.serverAddress + '/records/', {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify((({indivId, total, rates, readings}) => ({date: new Date(this.date).getTime()/1000, indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.store))
-        })
-        .then(() => {
-          this.wasSaved = true
-        })
+        const success = (this.store.historyIndex === 0 ? await this.postRecord() : await this.patchRecord())
+        if(!success) throw new Error("Unexpected status code was returned from server")
+        this.wasSaved = true
       } catch(error) {
-        console.error(`Error logging record for ${this.name}`, error)
+        console.error(`Error logging record for ${this.name}:\n`, error)
       }
-      this.currentlySubmitting = false
+    },
+    async postRecord() {
+      const res = await fetch(window.serverAddress + '/records/', {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify((({indivId, total, rates, readings}) => ({date: new Date(this.date).getTime()/1000, indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.store))
+      })
+      return res.status === 204
+    },
+    async patchRecord() {
+      const res = await fetch(window.serverAddress + '/records/' + this.store.recordId, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify((({indivId, total, rates, readings}) => ({date: new Date(this.date).getTime()/1000, indivId, total, rates:JSON.stringify(rates), readings:JSON.stringify(readings)}))(this.store))
+      })
+      return res.status === 204
     },
   },
   created() {
