@@ -37,14 +37,14 @@ export default {
       return new File([blob], `${this.name}-${dateStr}.png`, {type: blob.type})
     },
     async shareImage() {
-      this.saveRecordToDB()
+      if(this.store.historyIndex===0) this.saveRecordToDB()
       const file = await this.getFile()
       if(navigator.canShare({files: [file]}))
         navigator.share({files: [file]})
       this.store.$reset()
     },
     async download() {
-      this.saveRecordToDB()
+      if(this.store.historyIndex===0) this.saveRecordToDB()
       const file = await this.getFile()
       const link = window.URL.createObjectURL(file)
       let a = document.createElement("a")
