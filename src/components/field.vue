@@ -8,8 +8,13 @@ export default{
   props: ["type", "name"],
   computed: {
     ...mapState(useMainStore, ['stores']),
-    data() {
+    store() {
       return this.stores[this.name]
+    }
+  },
+  methods: {
+    setAsNumber(event) {
+      this.store.readings[this.type] = Number(event.target.value)
     }
   },
 }
@@ -21,8 +26,9 @@ export default{
     <h3 style="text-decoration: underline">{{ name }}</h3>
   </div>
   <div v-else-if="type === 'gas'" class="field-box">
-    <select v-model="data.readings[type]">
+    <select :value="store.readings[type]" @change="setAsNumber">
       <option value="0">0</option>
+      <hr></hr>
       <option value="1">1</option>
       <option value="2">2</option>
       <option value="3">3</option>
@@ -31,7 +37,7 @@ export default{
   <div v-else class="field-box">
     <div class="field">
       <button class="symbol" @click="$router.push(`/camera/${type[0]}/${name}`)"></button>
-      <input v-model="data.readings[type]" type="number" class="numbers" min="0" max="999999">
+      <input v-model="store.readings[type]" type="number" class="numbers" min="0" max="999999">
     </div>
   </div>
 </template>
