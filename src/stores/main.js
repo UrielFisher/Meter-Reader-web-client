@@ -48,9 +48,28 @@ export const useMainStore = defineStore('main', {
           for(let property in individual) {
             this.stores[individual.name][property] = individual[property]
           }
+          this.stores[individual.name].fetchRecordHistory()
         }
-        this.stores[individual.name].fetchRecordHistory()
       }
+    },
+
+    /**
+     * Resets specified store to initial state, then fit with freshly
+     * fetched individual data and record history.
+     * @param {string} name - name of an individual's store to reset
+    */
+    async resetStore(name) {
+      const individuals = await fetch(`${window.serverAddress}/individuals/`).then(res => res.json())
+      const individual = individuals.find(indiv => indiv.name === name)
+      if(!individual) {
+        console.warn("The store name given for reset does not exist under this user, store will not reset")
+        return
+      }
+      await this.stores[name].$reset()
+      for(let property in individual) {
+        this.stores[individual.name][property] = individual[property]
+      }
+      await this.stores[individual.name].fetchRecordHistory()
     },
 
     // fetches user settings from the server

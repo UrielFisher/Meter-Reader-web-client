@@ -10,7 +10,6 @@ export default {
   data: () => ({
     canShare: false,
     wasDownloaded: false,
-    wasSaved: false,
     currentlySubmitting: false
   }),
   computed: {
@@ -22,7 +21,11 @@ export default {
       return this.mainStore.stores[this.name]
     },
     date() {
-      return new Date(this.store.history[this.store.historyIndex].date*1000).toISOString().split('T')[0]
+      if(this.store?.history?.length <= this.store?.historyIndex) {
+        return new Date(this.store.history[this.store.historyIndex].date*1000).toISOString().split('T')[0]
+      } else {
+        return new Date().toISOString().split('T')[0]
+      }
     },
     sewerAmount() {
       // check for time in months since last bill
@@ -69,13 +72,14 @@ export default {
     },
     async saveRecordToDB() {
       // check for no ongoing requests
-      if(this.currentlySubmitting || this.wasSaved) return
+      if(this.currentlySubmitting || this.store.wasSaved) return
       this.currentlySubmitting = true
 
       try {
         const success = (this.store.historyIndex === 0 ? await this.postRecord() : await this.patchRecord())
         if(!success) throw new Error("Unexpected status code was returned from server")
-        this.wasSaved = true
+        await this.mainStore.resetStore(this.store.name)
+        this.store.historyIndex = 1
       } catch(error) {
         console.error(`Error logging record for ${this.name}:\n`, error)
       }
@@ -109,7 +113,7 @@ export default {
   watch: {
     'store.history[store.historyIndex]': {
       handler() {
-        this.wasSaved = false
+        this.store.wasSaved = false
         this.wasDownloaded = false
       },
       deep: true
@@ -123,8 +127,8 @@ export default {
     <button class="backButton" @click="$router.push('/')">></button>
     <div class="historyNavigation">
       <button @click="store.historyIndex--" :disabled="!(store.historyIndex > 0)"                     ><</button>
-      <button @click="saveRecordToDB()" class="saveButton" :class="{'justSaved' : wasSaved}" :style="'background-color:' + (store.historyIndex===0 ? 'lightblue' : 'orange')">s</button>
-      <button @click="store.historyIndex++" :disabled="!(store.historyIndex < store.history.length-1)">></button>
+      <button @click="saveRecordToDB()" class="saveButton" :class="{'justSaved' : store.wasSaved}" :style="'background-color:' + (store.historyIndex===0 ? 'lightblue' : 'orange')">s</button>
+      <button @click="store.historyIndex++" :disabled="!(store.historyIndex < store.history?.length-1)">></button>
     </div>
     <div id="paper" ref="paper">
       <div id="header">

@@ -24,6 +24,7 @@ export const makeIndividualStore = (name) => {
           gas: null,
           sewer: null,
         },
+        wasSaved: false,
       },{
         date: undefined,
         readings: {
@@ -38,6 +39,7 @@ export const makeIndividualStore = (name) => {
           gas: null,
           sewer: null,
         },
+        wasSaved: true,
       },],
 
       eImg: {img: null,value: null},
@@ -46,6 +48,9 @@ export const makeIndividualStore = (name) => {
     getters: {
       recordId: (state) => {
         return state.historyIndex ? state.history[state.historyIndex].recordId : undefined
+      },
+      wasSaved: (state) => {
+        return state.history[state.historyIndex].wasSaved
       },
       date: (state) => {
         return state.history[state.historyIndex].date
@@ -88,6 +93,7 @@ export const makeIndividualStore = (name) => {
                 } catch(e) {}
               }
             }
+            record.wasSaved = true
           }
           return res
         })
