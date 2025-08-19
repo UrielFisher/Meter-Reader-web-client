@@ -18,7 +18,8 @@ export default{
 <template>
   <div class="parent">
     <div id="container">
-      <Indiv v-for="{name} in stores" class="individual" :name="name" :key="name">
+      <Indiv v-for="{name, historyIndex} in stores" :name="name" :key="name"
+      :class="{'past' : (historyIndex > 0)}">
       </Indiv>
     </div>
     <button id="settings" @click="$router.push('/settings')">⚙️</button>

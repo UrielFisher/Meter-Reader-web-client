@@ -36,6 +36,10 @@ export default{
   border: 2.5px solid #000000bb;
 }
 
+.list-item.past {
+  border-color: orange;
+}
+
 .sumUp {
   width: 5vh;
   height: 5vh;
