@@ -72,17 +72,21 @@ export default {
     },
     async saveRecordToDB() {
       // check for no ongoing requests
-      if(this.currentlySubmitting || this.store.wasSaved) return
+      if(this.currentlySubmitting) return
       this.currentlySubmitting = true
 
       try {
         const success = (this.store.historyIndex === 0 ? await this.postRecord() : await this.patchRecord())
         if(!success) throw new Error("Unexpected status code was returned from server")
-        await this.mainStore.resetStore(this.store.name)
-        this.store.historyIndex = 1
+        this.animateButtonSaving()
+        if(this.store.historyIndex === 0) {
+          await this.mainStore.resetStore(this.store.name)
+          this.store.historyIndex = 1
+        }
       } catch(error) {
         console.error(`Error logging record for ${this.name}:\n`, error)
       }
+      setTimeout(()=>{this.currentlySubmitting = false}, 100)
     },
     async postRecord() {
       const res = await fetch(window.serverAddress + '/records/', {
@@ -100,6 +104,20 @@ export default {
       })
       return res.status === 204
     },
+    animateButtonSaving() {
+      const button = document.getElementById("saveButton");
+      button.animate(
+        [
+          {outlineWidth: '0px', outlineOffset: '15px'},
+          {outlineWidth: '5px', outlineOffset: '-1px'},
+          {outlineWidth: '0px', outlineOffset: '-1px'},
+        ],
+        {
+          duration: 700,
+          easing: "ease-out",
+        }
+      )
+    },
   },
   created() {
     if(navigator?.canShare && navigator.canShare({text: ""}))
@@ -113,7 +131,6 @@ export default {
   watch: {
     'store.history[store.historyIndex]': {
       handler() {
-        this.store.wasSaved = false
         this.wasDownloaded = false
       },
       deep: true
@@ -127,7 +144,7 @@ export default {
     <button class="backButton" @click="$router.push('/')">></button>
     <div class="historyNavigation">
       <button @click="store.historyIndex--" :disabled="!(store.historyIndex > 0)"                     ><</button>
-      <button @click="saveRecordToDB()" class="saveButton" :class="{'justSaved' : store.wasSaved}" :style="'background-color:' + (store.historyIndex===0 ? 'lightblue' : 'orange')">s</button>
+      <button @click="saveRecordToDB()" id="saveButton" :style="'background-color:' + (store.historyIndex===0 ? 'lightblue' : 'orange')">s</button>
       <button @click="store.historyIndex++" :disabled="!(store.historyIndex < store.history?.length-1)">></button>
     </div>
     <div id="paper" ref="paper">
@@ -272,7 +289,7 @@ export default {
   background-image: url("./../assets/img/download.svg");
 }
 
-.saveButton {
+#saveButton {
   float: right;
   font-size: 18px;
   height: 30px;
@@ -283,39 +300,12 @@ export default {
   border-radius: 20%;
 }
 
-.justSaved {
-  animation: outline-saved 500ms ease-out;
-  outline-width: 3px;
-  outline-offset: -1px;
-  border: none;
-}
-
 .historyNavigation {
   position: absolute;
   display: flex;
   align-items: center;
   left: 50%;
   transform: translateX(-50%);
-}
-
-
-
-@keyframes outline-saved {
-  0% {
-    outline-width: 0px;
-    outline-offset: -15px;
-    
-  }
-  30% {
-    outline-width: 10px;
-    outline-offset: -15px;
-    border: 2px solid black;
-  }
-  100% {
-    outline-width: 3px;
-    outline-offset: -1px;
-    border: none
-  }
 }
 </style>
 
