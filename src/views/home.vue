@@ -39,6 +39,7 @@ export default{
   border: none;
   border-radius: 50%;
   font-size: 50px;
+  padding: 12px;
 }
 
 #settings:active {
