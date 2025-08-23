@@ -36,7 +36,12 @@ export default{
   </div>
   <div v-else class="field-box">
     <div class="field">
-      <button class="symbol" @click="$router.push(`/camera/${type[0]}/${name}`)"></button>
+      <button class="symbol-button" @click="$router.push(`/camera/${type[0]}/${name}`)">
+        <img class="symbol" :src="`/${type}.svg`"
+        onload="this.onerror=null;this.onload=null;"
+        onerror="this.onerror=null;this.onload=null;this.src='/empty.svg'"
+        />
+      </button>
       <input v-model="store.readings[type]" type="number" class="numbers" min="0" max="999999">
     </div>
   </div>
@@ -60,15 +65,25 @@ export default{
   justify-content: space-evenly;
 }
 
-.symbol {
+.symbol-button {
+  position: relative;
   height: 5vh;
   width: 5vh;
   border-radius: 50px;
-  background-color: coral;
+  background-color: lightgray;
+}
+
+.symbol-button:hover {
+  background-color: gray;
+}
+
+.symbol {
+  position: absolute;
+  height: 75%;
+  transform: translate(50%, -50%)
 }
 
 .numbers {
-  
   width: 4em;
 }
 
