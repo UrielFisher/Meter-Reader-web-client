@@ -119,7 +119,8 @@ export default{
     <video id="video"></video>
     <Transition name="image"><img id="picture" :key="toggleToSnap" :src="this.source.img" v-if="this.source.img" /></Transition>
     <button class="backButton" @click="$router.push('/')">></button>
-    <button id="snapButton" @click="takePicture(); toggleToSnap=!toggleToSnap;">Take picture</button>
+    <button id="snapButton" @click="takePicture(); toggleToSnap=!toggleToSnap;"><img src="/shutter.svg" alt="Take picture" /></button>
+    <button id="galleryButton"><img src="/gallery.svg" alt="Gallery" /></button>
   </div>
 </template>
 
@@ -163,12 +164,45 @@ export default{
 
 #snapButton {
   position: fixed;
-  width: 10vh;
   height: 10vh;
+  width: 10vh;
   bottom: 10vh;
   left: calc(50vw - 5vh);
-  border-radius: 50px;
-  /* outline: 3px dashed orange; */
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background-color: hsl(0, 0%, 95%);
+}
+
+#snapButton:hover {
+  background-color: hsl(0, 0%, 83%);
+}
+
+#snapButton > img {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  height: 101%;
+}
+
+#galleryButton {
+  position: fixed;
+  height: 8vh;
+  width: 8vh;
+  bottom: 30px;
+  left: 30px;
+  border-radius: 25px;
+  background-color: hsl(0, 0%, 90%);
+  cursor: pointer;
+}
+
+#galleryButton:hover {
+  background-color: hsl(0, 0%, 83%);
+}
+
+#galleryButton > img {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  height: 70%;
 }
 
 #canvas {
