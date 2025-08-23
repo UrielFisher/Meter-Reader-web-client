@@ -165,7 +165,7 @@ export default{
 
     // Closes settings field editor
     closeEditor() {
-      if(this.mainStore[this.showEditor] === this.value) this.changesMade = true
+      if(this.mainStore[this.showEditor] !== this.value) this.changesMade = true
 
       this.mainStore[this.showEditor] = this.value
       this.showEditor = ''
@@ -173,7 +173,7 @@ export default{
 
     // Possibly closes settings field editor
     ifAlreadyOpen(index) {
-      if(this.showEditor !== this.settings[index].variableName)
+      if(this.showEditor && this.showEditor !== this.settings[index].variableName)
         this.closeEditor()
     },
     
