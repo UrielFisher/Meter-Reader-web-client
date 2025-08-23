@@ -1,7 +1,6 @@
 <script>
 import { mapState } from 'pinia';
 import { useMainStore } from './../stores/main.js'
-import { makeIndividualStore } from '../stores/individual';
 
 export default{
   name: "Field",
