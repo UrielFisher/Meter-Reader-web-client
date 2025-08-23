@@ -22,7 +22,7 @@ export default{
       :class="{'past' : (historyIndex > 0)}">
       </Indiv>
     </div>
-    <button id="settings" @click="$router.push('/settings')">⚙️</button>
+    <button id="settings" @click="$router.push('/settings')"><img src="/fence.svg" /></button>
   </div>
 </template>
 

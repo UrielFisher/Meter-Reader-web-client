@@ -282,11 +282,11 @@ export default {
 }
 
 .shareBtn:last-child {
-  background-image: url("./../assets/img/whatsapp_logo_green.png");
+  background-image: url("/whatsapp_logo_green.png");
 }
 
 .shareBtn:first-child {
-  background-image: url("./../assets/img/download.svg");
+  background-image: url("/download.svg");
 }
 
 #saveButton {

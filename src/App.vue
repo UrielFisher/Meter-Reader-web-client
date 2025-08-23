@@ -7,7 +7,7 @@ export default{
   methods: {
     ...mapActions(useMainStore, ['initiate']),
     getImageAsBase64(imagePath) {
-      fetch("http://localhost:5173/src/assets/img/google-ocr-sign.jpg")
+      fetch("http://localhost:5173/public/google-ocr-sign.jpg")
         .then(response => response.blob())
         .then(blob => {
           var reader = new FileReader();

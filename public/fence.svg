@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" style="stroke-width:1px; stroke:grey; fill:grey; stroke-linecap:square;">
+  <title>Settings</title>
+  <g filter="brightness(0.7)">
+    <path d="M5,40 L95,40 L95,46 L5,46, L5,40"></path>
+    <path d="M5,70 L95,70 L95,76 L5,76, L5,70"></path>
+  </g>
+  <g>
+    <path d="M20,7 L28,15 L28,93 L12,93 L12,15 L20,7"></path>
+    <path d="M50,7 L58,15 L58,93 L42,93 L42,15 L50,7"></path>
+    <path d="M80,7 L88,15 L88,93 L72,93 L72,15 L80,7"></path>
+  </g>
+</svg>
