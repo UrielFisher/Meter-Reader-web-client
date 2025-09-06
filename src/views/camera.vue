@@ -172,16 +172,27 @@ export default{
   border: none;
   cursor: pointer;
   background-color: hsl(0, 0%, 95%);
+  background-clip: content-box;
+  padding: 3px;
+  transition: all 0.5s;
+  cursor: pointer;
 }
 
 #snapButton:hover {
   background-color: hsl(0, 0%, 83%);
 }
 
+#snapButton:active {
+  animation: snap 50ms ease-out;
+}
+
 #snapButton > img {
   position: absolute;
   transform: translate(-50%, -50%);
-  height: 101%;
+  height: 100%;
+  border-radius: 50%;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 #galleryButton {
@@ -192,6 +203,7 @@ export default{
   left: 30px;
   border-radius: 25px;
   background-color: hsl(0, 0%, 90%);
+  user-select: none;
   cursor: pointer;
 }
 
@@ -203,9 +215,21 @@ export default{
   position: absolute;
   transform: translate(-50%, -50%);
   height: 70%;
+  -webkit-user-drag: none;
 }
 
 #canvas {
   display: none;
+}
+
+
+
+@keyframes snap {
+  from {
+    transform: scale(1.3);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 </style>
