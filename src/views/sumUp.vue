@@ -174,7 +174,7 @@ export default {
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="v, k in Object.fromEntries(Object.entries(store?.readings ?? {}).filter(x => x[1]))">{{ (v * store?.rates[k]).toFixed(2) }}</p>
+            <p class="additive" v-for="v, k in Object.fromEntries(Object.entries(store?.readings ?? {}).filter(x => x[1]))">{{ (v * store?.rates[k] * (k==='electricity'?1.18:1)).toFixed(2) }}</p>
             <p id="total">{{ store?.total }}</p>
           </div>
         </span>
@@ -191,6 +191,7 @@ export default {
 <style scoped>
 #paper {
   height: calc(100vw * 1.414);
+  background-color: white;
 }
 
 #header {
@@ -207,9 +208,11 @@ export default {
 }
 
 #date {
+  width: fit-content;
   background-color: transparent;
   border: none;
   font-size: 1rem;
+  -webkit-appearance: none;
 }
 
 #content {
@@ -235,7 +238,7 @@ export default {
 
 :is(#gas, #sewer) .partBody {
   width: fit-content;
-  margin-right: auto;
+  /* margin-right: auto; */
 }
 
 #sum {
@@ -258,7 +261,21 @@ export default {
 #total{
   width: fit-content;
   border-top: 1px solid black;
-  border-bottom: 3px double black;
+}
+
+#total::after {
+  content: "";
+  display: block;
+  position: relative;
+  height: 3px;
+  width: 120%;
+  top: -1px;
+  right: -10%;
+  /* background-color: black;
+  background-clip: content-box;
+  padding-block: 1.5px; */
+  border-block: 1px solid black;
+  z-index: 1;
 }
 
 #shareBar {

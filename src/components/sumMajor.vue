@@ -63,5 +63,8 @@ export default {
 
 .enil { border-bottom: 1px solid black; }
 
-input{ border: none; }
+input {
+  background-color: transparent;
+  border: none;
+}
 </style>
