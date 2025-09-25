@@ -62,14 +62,15 @@ export const makeIndividualStore = (name) => {
       total: (state) => {
         let sum = 0
         for(let type in state.readings) {
+          if(!state.readings[type]) continue
           let amount
           try {
             amount = (state.readings[type] ?? 0) - (state.previousReadings[type] ?? 0)
           } catch(e) {
-            amount =  state.readings[type]
+            amount = state.readings[type]
           }
 
-          sum += amount * state.rates[type] ?? 0
+          sum += (amount * state.rates[type] ?? 0).toFixed(2) * (type === "electricity" ? 1.18 : 1)
         }
         return sum.toFixed(2)
       }

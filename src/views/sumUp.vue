@@ -174,7 +174,7 @@ export default {
         </span>
         <span id="sum">
           <div class="sumDiv">
-            <p class="additive" v-for="v, k in Object.fromEntries(Object.entries(store?.readings ?? {}).filter(x => x[1]))">{{ (v * store?.rates[k] * (k==='electricity'?1.18:1)).toFixed(2) }}</p>
+            <p class="additive" v-for="v, k in Object.fromEntries(Object.entries(store?.readings ?? {}).filter(x => x[1]))">{{ (((v - store?.previousReadings[k] ?? 0) * store?.rates[k]).toFixed(2) * (k==='electricity'?1.18:1)).toFixed(2) }}</p>
             <p id="total">{{ store?.total }}</p>
           </div>
         </span>
