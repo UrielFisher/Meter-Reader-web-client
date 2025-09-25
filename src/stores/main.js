@@ -94,9 +94,10 @@ export const useMainStore = defineStore('main', {
         body: b64
       })
       .then(data=> data.json())
-      .then(data => data.responses[0])
+      .then(data=> {if(data.status_code !== 200) throw new Error(`[Code: ${data.status_code}] - ${data.data}`); return data})
+      .then(data => data.data.responses[0])
       .then(data => this.actualReading(data))
-      .catch((e)=>{console.log("failure: " + e);})
+      .catch((e)=>{console.log("failure getting OCR: " + e);})
     },
 
     /**

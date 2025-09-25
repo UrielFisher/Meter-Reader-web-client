@@ -6,6 +6,7 @@ export default{
   name: "Camera",
   data() {
     return {
+      awaitingOCR: false,
       videoStream: undefined,
       height: 0,
       width: 320,
@@ -84,6 +85,7 @@ export default{
     async takePicture() {
       const context = this.canvas.getContext("2d");
       if (this.width && this.height) {
+        this.awaitingOCR = true
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         context.drawImage(this.video, 0, 0, this.width, this.height);
@@ -95,8 +97,9 @@ export default{
         this.source.value = await this.mainStore.ocr(rawData)
         const type = this.$route.params.type==="e" ? "electricity" : "water"
         this.indivStore.readings[type] = this.source.value?.join('')
-        if(!this.source.value.includes(undefined))
+        if(!this.source.value?.includes(undefined))
           this.$router.push('/')
+        this.awaitingOCR = false
       } else {
         this.clearPicture();
       }
@@ -118,7 +121,8 @@ export default{
     <canvas id="canvas"></canvas>
     <video id="video"></video>
     <Transition name="image"><img id="picture" :key="toggleToSnap" :src="this.source.img" v-if="this.source.img" /></Transition>
-    <button class="backButton" @click="$router.push('/')">></button>
+    <div    v-if="awaitingOCR" class="backButton" id="backLoader"></div>
+    <button v-else             class="backButton" @click="$router.push('/')">></button>
     <button id="snapButton" @click="takePicture(); toggleToSnap=!toggleToSnap;"><img src="/shutter.svg" alt="Take picture" /></button>
     <button id="galleryButton"><img src="/gallery.svg" alt="Gallery" /></button>
   </div>
@@ -222,6 +226,12 @@ export default{
   display: none;
 }
 
+#backLoader {
+  border-right: 1px solid black;
+  border-radius: 50%;
+  animation: 500ms spin linear infinite;
+}
+
 
 
 @keyframes snap {
@@ -230,6 +240,15 @@ export default{
   }
   to {
     transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotateZ(0deg);
+  }
+  to {
+    transform: rotateZ(360deg);
   }
 }
 </style>
