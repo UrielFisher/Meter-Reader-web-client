@@ -117,16 +117,15 @@ export const useMainStore = defineStore('main', {
         if(regex.test(description))
           possibilities.push(index)
       }
-      console.log("Possible OCR blocks:", possibilities);
       if(!possibilities.length){
         console.warn("No data from the image was found to fit the pattern");
         return []
       }
 
       // use 'possibilities' for getting options to compare with last reading value, and also use with multi meter reading
-      console.log("Out of the following blocks:", ocrResult.fullTextAnnotation.pages[0].blocks);
       
       const ocrData = ocrResult.fullTextAnnotation.pages[0].blocks[possibilities[0] - 1].paragraphs[0].words[0].symbols.slice(0,pattern.length)
+      
       return this.fillPattern(pattern, ocrData)
     },
 
