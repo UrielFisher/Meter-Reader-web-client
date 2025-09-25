@@ -21,6 +21,7 @@ export default{
       <Indiv v-for="{name, historyIndex} in stores" :name="name" :key="name"
       :class="{'past' : (historyIndex > 0)}">
       </Indiv>
+      <div v-if="!Object.keys(stores)?.length" class="no-indivs-sign">נראה שאתם לא מנהלים מידע על אף בית.<br>היכנסו להגדרות, לחצו על הפלוס ומלאו את הפרטים ליצירת בית למעקב.</div>
     </div>
     <button id="settings" @click="$router.push('/settings')"><img src="/fence.svg" /></button>
   </div>
@@ -44,5 +45,18 @@ export default{
 
 #settings:active {
   background-color: lightgray;
+}
+
+.no-indivs-sign {
+  direction: rtl;
+  width: 90vw;
+  margin: 20px 5vw;
+  padding: 10px;
+  text-align: center;
+  /* outline: 3px solid black; */
+  background-color: lavender;
+  border-radius: 20px;
+  /* font-weight: 500; */
+  font-family: serif;
 }
 </style>
